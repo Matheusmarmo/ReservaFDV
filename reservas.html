@@ -1,265 +1,553 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FDV — Acesso ao Sistema</title>
+  <title>FDV — Reservas de Espaços</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --navy: #0e1a38;
-      --navy2: #162040;
-      --navy3: #1e2d55;
-      --blue: #1a6fc4;
-      --sky: #4eaee8;
-      --sky-lt: #e8f4fc;
-      --white: #ffffff;
-      --off: #f4f6fa;
-      --border: #dce3ef;
-      --text: #1a2340;
-      --muted: #6b7a99;
-      --danger: #d93a3a;
-      --success: #1a9e5c;
+      --navy: #0e1a38; --navy2: #162040; --navy3: #1e2d55;
+      --blue: #1a6fc4; --sky: #4eaee8; --sky-lt: #e8f4fc;
+      --white: #ffffff; --off: #f4f6fa; --border: #dce3ef;
+      --text: #1a2340; --muted: #6b7a99;
+      --danger: #d93a3a; --success: #1a9e5c;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Open Sans', sans-serif;
-      background: var(--off);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
+    body { font-family: 'Open Sans', sans-serif; background: var(--off); color: var(--text); min-height: 100vh; }
     .topbar { background: var(--navy); height: 7px; }
-
     header {
-      background: var(--navy);
-      padding: 0 40px;
-      display: flex;
-      align-items: center;
-      height: 68px;
+      background: var(--navy); padding: 0 40px;
+      display: flex; align-items: center; gap: 0; height: 68px; position: relative;
     }
-
     .header-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.9);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.9); letter-spacing: 0.04em; text-transform: uppercase;
     }
-
+    .header-right {
+      margin-left: auto; display: flex; align-items: center; gap: 16px;
+    }
+    .header-user {
+      font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'Open Sans', sans-serif;
+    }
+    .btn-logout {
+      background: transparent; border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.7); border-radius: 5px; padding: 5px 12px;
+      font-size: 11px; font-family: 'Montserrat', sans-serif; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
     .nav-strip {
-      background: var(--navy2);
-      border-bottom: 3px solid var(--blue);
-      height: 42px;
+      background: var(--navy2); border-bottom: 3px solid var(--blue);
+      padding: 0 40px; display: flex; align-items: center; height: 42px; gap: 4px;
     }
-
-    .login-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 16px;
+    .nav-strip a {
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+      color: rgba(255,255,255,0.6); text-decoration: none; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 0 14px; height: 100%;
+      display: flex; align-items: center; border-bottom: 3px solid transparent;
+      margin-bottom: -3px; transition: color 0.2s, border-color 0.2s;
     }
-
-    .login-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 40px 36px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 24px rgba(14,26,56,0.08);
+    .nav-strip a:hover { color: #fff; }
+    .nav-strip a.active { color: #fff; border-bottom-color: var(--sky); }
+    .main-layout { display: grid; grid-template-columns: 360px 1fr; min-height: calc(100vh - 120px); }
+    .sidebar {
+      background: var(--white); border-right: 1px solid var(--border);
+      padding: 28px 24px; display: flex; flex-direction: column; gap: 22px;
     }
-
-    .login-card h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--navy);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .sidebar-heading {
+      font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800;
+      color: var(--navy); text-transform: uppercase; letter-spacing: 0.04em;
+      padding-bottom: 14px; border-bottom: 2px solid var(--blue);
+      display: flex; align-items: center; gap: 8px;
     }
-
-    .login-card h1::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 20px;
-      background: var(--sky);
-      border-radius: 2px;
+    .sidebar-heading::before {
+      content: ''; display: inline-block; width: 4px; height: 18px;
+      background: var(--sky); border-radius: 2px;
     }
-
-    .login-subtitle {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 28px;
-      padding-left: 12px;
+    .section-label {
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px;
     }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin-bottom: 16px;
-    }
-
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
     label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      font-family: 'Montserrat', sans-serif;
-      letter-spacing: 0.02em;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      font-family: 'Montserrat', sans-serif; letter-spacing: 0.02em;
     }
-
-    input {
-      background: var(--off);
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: 'Open Sans', sans-serif;
-      font-size: 13px;
-      padding: 10px 12px;
-      width: 100%;
-      outline: none;
+    select, input, textarea {
+      background: var(--off); border: 1.5px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: 'Open Sans', sans-serif; font-size: 13px;
+      padding: 9px 12px; width: 100%; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-
-    input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(26,111,196,0.12);
-      background: #fff;
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,111,196,0.12); background: #fff;
     }
-
-    input.error {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(217,58,58,0.12);
-    }
-
+    textarea { resize: vertical; min-height: 72px; }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .btn-primary {
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 11px;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.2s;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-top: 8px;
+      background: var(--blue); color: #fff; border: none; border-radius: 6px;
+      font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700;
+      padding: 11px; cursor: pointer; width: 100%; transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.04em; text-transform: uppercase;
     }
-
     .btn-primary:hover { background: #1560aa; }
-    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; }
-
-    .error-msg {
-      background: #fdf0f0;
-      border: 1px solid #f5c0c0;
-      border-radius: 6px;
-      color: var(--danger);
-      font-size: 12px;
-      padding: 10px 12px;
-      margin-top: 12px;
-      display: none;
+    .btn-primary:active { transform: scale(0.98); }
+    .content-area { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+    .content-header {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
     }
-
-    .error-msg.show { display: block; }
+    .content-title {
+      font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800;
+      color: var(--navy); text-transform: uppercase; letter-spacing: 0.03em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .content-title::before {
+      content: ''; display: inline-block; width: 4px; height: 20px;
+      background: var(--sky); border-radius: 2px;
+    }
+    .count-badge {
+      background: var(--sky-lt); color: var(--blue); border-radius: 20px;
+      padding: 3px 10px; font-size: 11px; font-weight: 700; font-family: 'Montserrat', sans-serif;
+    }
+    .filters {
+      background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 18px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+    }
+    .filters .form-group { flex: 1; min-width: 140px; }
+    .reservations-list { display: flex; flex-direction: column; gap: 10px; }
+    .reservation-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 16px;
+      transition: box-shadow 0.2s;
+    }
+    .reservation-card:hover { box-shadow: 0 2px 12px rgba(14,26,56,0.08); }
+    .card-date {
+      background: var(--navy); color: #fff; border-radius: 8px;
+      width: 48px; height: 52px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-date .day { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; line-height: 1; }
+    .card-date .month { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; opacity: 0.7; margin-top: 2px; }
+    .card-info { flex: 1; min-width: 0; }
+    .room { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; }
+    .type-sala { background: #e8f0fc; color: #1a4fc4; }
+    .type-auditorio { background: #f0e8fc; color: #7a1ac4; }
+    .type-lab { background: #e8fcf0; color: #1a9e5c; }
+    .event { font-size: 12px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .time-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--sky-lt); color: var(--blue); border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600; margin-top: 6px; }
+    .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-del {
+      background: #fdf0f0; border: 1px solid #f5c0c0; color: var(--danger);
+      border-radius: 5px; padding: 6px 12px; font-size: 11px; font-family: 'Montserrat', sans-serif;
+      font-weight: 700; cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+    }
+    .btn-del:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state p { font-size: 13px; line-height: 1.6; }
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; background: var(--navy);
+      color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px;
+      display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none; max-width: 400px; z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .toast.success .toast-icon { color: var(--success); }
+    .toast.error .toast-icon { color: var(--danger); }
+    .toast-icon { font-size: 16px; font-weight: 800; }
+    .perfil-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 20px; font-family: 'Montserrat', sans-serif;
+    }
+    .perfil-admin { background: #fff3e0; color: #e65100; }
+    .perfil-gerenciador { background: #e8f0fc; color: #1a4fc4; }
+    .perfil-visualizador { background: #f0f0f0; color: #666; }
   </style>
 </head>
+
 <body>
   <div class="topbar"></div>
   <header>
-    <span class="header-title">FDV — Sistema de Reservas de Espaços</span>
-  </header>
-  <div class="nav-strip"></div>
-
-  <div class="login-wrap">
-    <div class="login-card">
-      <h1>Acesso ao Sistema</h1>
-      <p class="login-subtitle">Informe suas credenciais para continuar</p>
-
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
-      </div>
-
-      <div class="form-group">
-        <label for="senha">Senha</label>
-        <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
-      </div>
-
-      <div class="error-msg" id="error-msg">E-mail ou senha incorretos. Tente novamente.</div>
-
-      <button class="btn-primary" id="btn-login" onclick="fazerLogin()">Entrar</button>
+    <span class="header-title">FDV — Reservas de Espaços</span>
+    <div class="header-right">
+      <span class="header-user" id="header-user"></span>
+      <button class="btn-logout" onclick="logout()">Sair</button>
     </div>
+  </header>
+  <div class="nav-strip">
+    <a href="reservas.html" class="active">Reservas</a>
+    <a href="admin.html" id="nav-admin" style="display:none">Administração</a>
+  </div>
+
+  <div class="main-layout">
+    <!-- SIDEBAR: formulário de nova reserva (oculto para visualizador) -->
+    <aside class="sidebar" id="sidebar-form">
+      <div class="sidebar-heading">Nova Reserva</div>
+
+      <div>
+        <div class="section-label">Espaço</div>
+        <div class="form-group">
+          <label for="tipo">Tipo</label>
+          <select id="tipo" onchange="updateRoomOptions()">
+            <option value="sala">Sala de Aula</option>
+            <option value="auditorio">Auditório</option>
+            <option value="lab">Laboratório</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sala">Sala / Espaço</label>
+          <select id="sala"></select>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Data e Horário</div>
+        <div class="form-group">
+          <label for="data">Data</label>
+          <input type="date" id="data">
+        </div>
+        <div class="time-grid">
+          <div class="form-group">
+            <label for="horario_inicio">Início</label>
+            <select id="horario_inicio"></select>
+          </div>
+          <div class="form-group">
+            <label for="horario_fim">Fim (opcional)</label>
+            <select id="horario_fim"></select>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Informações</div>
+        <div class="form-group">
+          <label id="label-favorecido">Responsável / Solicitante</label>
+          <input type="text" id="favorecido" placeholder="Nome do responsável">
+        </div>
+        <div class="form-group" id="evento-group">
+          <label id="label-evento">Curso / Evento</label>
+          <input type="text" id="evento" placeholder="Nome do evento ou curso">
+        </div>
+        <div class="form-group" id="motivo-group" style="display:none">
+          <label>Motivo</label>
+          <input type="text" id="motivo" placeholder="Motivo de uso do lab">
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea id="observacoes" placeholder="Informações adicionais..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="addReservation()">Confirmar Reserva</button>
+    </aside>
+
+    <!-- Sidebar substituta para visualizador -->
+    <aside class="sidebar" id="sidebar-viewer" style="display:none">
+      <div class="sidebar-heading">Consulta</div>
+      <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+        Seu perfil permite apenas a <strong>visualização</strong> das reservas.<br><br>
+        Use os filtros ao lado para consultar os espaços disponíveis.
+      </p>
+    </aside>
+
+    <main class="content-area">
+      <div class="content-header">
+        <div class="content-title">
+          Reservas
+          <span class="count-badge" id="count-label">0 reservas</span>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="form-group">
+          <label>Filtrar por Data</label>
+          <input type="date" id="filter-date" oninput="renderList()">
+        </div>
+        <div class="form-group">
+          <label>Tipo de Espaço</label>
+          <select id="filter-tipo" onchange="renderList()">
+            <option value="">Todos</option>
+            <option value="sala">Sala</option>
+            <option value="auditorio">Auditório</option>
+            <option value="lab">Laboratório</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Buscar</label>
+          <input type="text" id="filter-text" placeholder="Evento, sala, responsável..." oninput="renderList()">
+        </div>
+      </div>
+
+      <div class="reservations-list" id="reservations-list">
+        <div class="empty-state"><div class="icon">📋</div><p>Carregando reservas...</p></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toast-icon">✓</span>
+    <span id="toast-msg"></span>
   </div>
 
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // Se já estiver logado, redireciona direto
-    (async () => {
-      const session = await getSession();
-      if (session) {
-        const perfil = await getUserPerfil(session.user.id);
-        if (perfil) {
-          window.location.href = perfil.perfil === 'admin' ? 'admin.html' : 'reservas.html';
-        }
-      }
-    })();
+    const TABELA = 'reservas';
+    let reservations = [];
+    let perfilAtual = null;
+    let locaisMap = {};
 
-    async function fazerLogin() {
-      const email = document.getElementById('email').value.trim();
-      const senha = document.getElementById('senha').value;
-      const btn   = document.getElementById('btn-login');
-      const err   = document.getElementById('error-msg');
+    const HORARIOS = [
+      '7:30 - 8:20','8:20 - 9:10','9:10 - 9:30','9:30 - 10:20',
+      '10:20 - 11:10','11:10 - 12:00','13:00','14:00','15:00',
+      '16:00','17:00','18:00','19:00 - 19:50','19:50 - 20:40',
+      '20:40 - 21:00','21:00 - 21:50','21:50 - 22:40'
+    ];
 
-      err.classList.remove('show');
-      document.getElementById('email').classList.remove('error');
-      document.getElementById('senha').classList.remove('error');
+    // ── Init ─────────────────────────────────────────────────
+    window.addEventListener('load', async () => {
+      const style = document.createElement('style');
+      style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+      document.head.appendChild(style);
 
-      if (!email || !senha) {
-        err.textContent = 'Preencha e-mail e senha.';
-        err.classList.add('show');
-        return;
-      }
+      // Verifica sessão e perfil
+      perfilAtual = await protegerPagina(['admin', 'gerenciador', 'visualizador']);
+      if (!perfilAtual) return;
 
-      btn.disabled = true;
-      btn.textContent = 'Entrando...';
+      // Exibe nome e perfil no header
+      document.getElementById('header-user').innerHTML =
+        `${perfilAtual.nome} <span class="perfil-badge perfil-${perfilAtual.perfil}">${perfilAtual.perfil}</span>`;
 
-      const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
-
-      if (error || !data.session) {
-        err.textContent = 'E-mail ou senha incorretos. Tente novamente.';
-        err.classList.add('show');
-        document.getElementById('email').classList.add('error');
-        document.getElementById('senha').classList.add('error');
-        btn.disabled = false;
-        btn.textContent = 'Entrar';
-        return;
+      // Mostra link admin se for admin
+      if (perfilAtual.perfil === 'admin') {
+        document.getElementById('nav-admin').style.display = 'flex';
       }
 
-      const perfil = await getUserPerfil(data.session.user.id);
-      window.location.href = perfil?.perfil === 'admin' ? 'admin.html' : 'reservas.html';
+      // Controle de visibilidade por perfil
+      if (perfilAtual.perfil === 'visualizador') {
+        document.getElementById('sidebar-form').style.display = 'none';
+        document.getElementById('sidebar-viewer').style.display = 'flex';
+      }
+
+      // Data de hoje
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('data').value = today;
+
+      // Popula selects de horário
+      const hiSel = document.getElementById('horario_inicio');
+      const hfSel = document.getElementById('horario_fim');
+      HORARIOS.forEach(h => {
+        hiSel.innerHTML += `<option value="${h}">${h}</option>`;
+        hfSel.innerHTML += `<option value="${h}">${h}</option>`;
+      });
+      hfSel.innerHTML = '<option value="">Sem fim definido</option>' + hfSel.innerHTML;
+
+      // Carrega locais do Supabase
+      await loadLocais();
+
+      // Carrega reservas
+      await fetchReservations();
+    });
+
+    async function loadLocais() {
+      const { data, error } = await db.from('locais').select('*').eq('ativo', true).order('tipo').order('nome');
+      if (error || !data) return;
+
+      locaisMap = {};
+      data.forEach(l => {
+        if (!locaisMap[l.tipo]) locaisMap[l.tipo] = [];
+        locaisMap[l.tipo].push(l.nome);
+      });
+      updateRoomOptions();
     }
 
-    // Login ao pressionar Enter
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') fazerLogin();
-    });
+    function updateRoomOptions() {
+      const tipo = document.getElementById('tipo').value;
+      const sel = document.getElementById('sala');
+      const opcoes = locaisMap[tipo] || [];
+      sel.innerHTML = opcoes.map(s => `<option value="${s}">${s}</option>`).join('');
+
+      const motiGroup = document.getElementById('motivo-group');
+      const labEl = document.getElementById('label-evento');
+      const favEl = document.getElementById('label-favorecido');
+
+      if (tipo === 'lab') {
+        motiGroup.style.display = 'block';
+        labEl.textContent = 'Curso';
+        favEl.textContent = 'Responsável';
+      } else if (tipo === 'auditorio') {
+        motiGroup.style.display = 'none';
+        labEl.textContent = 'Descrição do Evento';
+        favEl.textContent = 'Favorecido';
+      } else {
+        motiGroup.style.display = 'none';
+        labEl.textContent = 'Curso / Evento';
+        favEl.textContent = 'Responsável / Solicitante';
+      }
+    }
+
+    async function fetchReservations() {
+      const { data, error } = await db.from(TABELA).select('*').order('data').order('horario_inicio');
+      if (error) { showToast('Erro ao carregar reservas.', 'error'); return; }
+      reservations = data || [];
+      renderList();
+    }
+
+    async function saveToSupabase(r) {
+      const { data, error } = await db.from(TABELA).insert([{
+        tipo: r.tipo, sala: r.sala, data: r.data,
+        horario_inicio: r.horario_inicio, horario_fim: r.horario_fim || null,
+        horario: r.horario, favorecido: r.favorecido,
+        evento: r.evento, motivo: r.motivo, observacoes: r.observacoes
+      }]).select().single();
+      if (error) throw error;
+      return data;
+    }
+
+    async function deleteFromSupabase(id) {
+      const { error } = await db.from(TABELA).delete().eq('id', id);
+      if (error) throw error;
+    }
+
+    function getSlots(hi, hf) {
+      if (!hf) return [hi];
+      const iStart = HORARIOS.indexOf(hi);
+      const iEnd = HORARIOS.indexOf(hf);
+      if (iStart === -1 || iEnd === -1 || iEnd < iStart) return [hi];
+      return HORARIOS.slice(iStart, iEnd + 1);
+    }
+
+    function setFieldError(id, hasError) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.borderColor = hasError ? 'var(--danger)' : '';
+      el.style.boxShadow = hasError ? '0 0 0 3px rgba(217,58,58,0.15)' : '';
+    }
+
+    function clearFieldErrors() {
+      ['data','sala','tipo','horario_inicio','favorecido','evento'].forEach(id => setFieldError(id, false));
+    }
+
+    async function addReservation() {
+      if (perfilAtual?.perfil === 'visualizador') return;
+      clearFieldErrors();
+
+      const data   = document.getElementById('data').value;
+      const sala   = document.getElementById('sala').value;
+      const tipo   = document.getElementById('tipo').value;
+      const hi     = document.getElementById('horario_inicio').value;
+      const hf     = document.getElementById('horario_fim').value;
+      const fav    = document.getElementById('favorecido').value.trim();
+      const ev     = document.getElementById('evento').value.trim();
+      const mot    = document.getElementById('motivo').value.trim();
+      const obs    = document.getElementById('observacoes').value.trim();
+
+      if (!data) { setFieldError('data', true); showToast('Selecione uma data.', 'error'); return; }
+      if (!ev && !fav) { setFieldError('favorecido', true); setFieldError('evento', true); showToast('Informe o responsável ou o evento.', 'error'); return; }
+
+      const newSlots = getSlots(hi, hf);
+      const conflict = reservations.find(r => {
+        if (r.sala !== sala || r.data !== data) return false;
+        return newSlots.some(s => getSlots(r.horario_inicio, r.horario_fim).includes(s));
+      });
+
+      if (conflict) {
+        setFieldError('horario_inicio', true); setFieldError('sala', true);
+        const d = new Date(data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+        showToast(`Conflito! "${conflict.sala}" já reservada em ${d} às ${conflict.horario_inicio} para "${conflict.evento || conflict.favorecido}".`, 'error', 6000);
+        return;
+      }
+
+      const horario = hf ? `${hi} até ${hf}` : hi;
+      const novaReserva = { tipo, sala, data, horario_inicio: hi, horario_fim: hf, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
+
+      try {
+        const salvo = await saveToSupabase(novaReserva);
+        reservations.push(salvo);
+        renderList();
+        showToast('Reserva adicionada com sucesso!', 'success');
+        ['evento','favorecido','motivo','observacoes'].forEach(id => document.getElementById(id).value = '');
+        clearFieldErrors();
+      } catch (err) {
+        showToast('Erro ao salvar reserva.', 'error');
+      }
+    }
+
+    async function deleteReservation(id) {
+      if (perfilAtual?.perfil === 'visualizador') return;
+      if (!confirm('Tem certeza que deseja remover esta reserva?')) return;
+      try {
+        await deleteFromSupabase(id);
+        reservations = reservations.filter(r => String(r.id) !== String(id));
+        renderList();
+        showToast('Reserva removida com sucesso.', 'success');
+      } catch (err) {
+        showToast('Erro ao remover reserva.', 'error');
+      }
+    }
+
+    function renderList() {
+      const fDate = document.getElementById('filter-date').value;
+      const fTipo = document.getElementById('filter-tipo').value;
+      const fText = document.getElementById('filter-text').value.toLowerCase();
+
+      let list = [...reservations];
+      if (fDate) list = list.filter(r => r.data === fDate);
+      if (fTipo) list = list.filter(r => r.tipo === fTipo);
+      if (fText) list = list.filter(r =>
+        (r.evento||'').toLowerCase().includes(fText) ||
+        (r.sala||'').toLowerCase().includes(fText) ||
+        (r.favorecido||'').toLowerCase().includes(fText)
+      );
+      list.sort((a, b) => a.data.localeCompare(b.data) || a.horario_inicio.localeCompare(b.horario_inicio));
+
+      const container = document.getElementById('reservations-list');
+      document.getElementById('count-label').textContent = `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
+
+      const podeExcluir = perfilAtual?.perfil === 'admin';
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>${reservations.length > 0 ? 'Nenhuma reserva corresponde ao filtro.' : 'Nenhuma reserva cadastrada ainda.'}</p></div>`;
+        return;
+      }
+
+      const months = ['','JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+      container.innerHTML = list.map(r => {
+        const [,, day] = r.data.split('-');
+        const mon = months[parseInt(r.data.split('-')[1])];
+        const typeLbl = r.tipo === 'sala' ? 'Sala' : r.tipo === 'auditorio' ? 'Auditório' : 'Lab';
+        const desc = r.evento || r.favorecido || '—';
+        const sub = [r.favorecido, r.observacoes].filter(Boolean).join(' · ');
+        return `<div class="reservation-card">
+          <div class="card-date"><div class="day">${day}</div><div class="month">${mon}</div></div>
+          <div class="card-info">
+            <div class="room">${r.sala} <span class="type-badge type-${r.tipo}">${typeLbl}</span></div>
+            <div class="event">${desc}</div>
+            ${sub ? `<div class="event" style="margin-top:2px;font-size:11px">${sub}</div>` : ''}
+            <span class="time-badge">⏱ ${r.horario}</span>
+          </div>
+          <div class="card-actions">
+            ${podeExcluir ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    let _toastTimer = null;
+    function showToast(msg, type = 'success', duration = 3500) {
+      const t = document.getElementById('toast');
+      if (_toastTimer) clearTimeout(_toastTimer);
+      t.className = `toast show ${type}`;
+      document.getElementById('toast-icon').textContent = type === 'success' ? '✓' : '✕';
+      document.getElementById('toast-msg').textContent = msg;
+      _toastTimer = setTimeout(() => { t.className = 'toast'; }, duration);
+    }
   </script>
 </body>
 </html>
