@@ -215,8 +215,12 @@
   </div>
 
   <script src="js/supabase.js"></script>
-  <script src="js/auth.js"></script>
-  <script>
+<script src="js/auth.js"></script>
+<script>
+  // Cliente secundário para criar usuários sem afetar a sessão do admin
+  const dbUser = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+  });
     let editandoUsuarioId = null;
     let editandoLocalId   = null;
 
@@ -287,11 +291,11 @@
       if (!editandoUsuarioId) {
         // Novo usuário via Admin API (Edge Function)
         if (!senha || senha.length < 6) { showToast('Senha deve ter ao menos 6 caracteres.', 'error'); return; }
-        const { data, error } = await db.auth.signUp({
-          email, password: senha,
-          options: { data: { nome, perfil } }
-        });
-        if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); return; }
+       const { data, error } = await dbUser.auth.signUp({
+  email, password: senha,
+  options: { data: { nome, perfil } }
+});
+if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); return; }
       } else {
         // Editar perfil existente
         const { error } = await db.from('profiles')
