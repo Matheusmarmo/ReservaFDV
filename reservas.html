@@ -143,6 +143,13 @@
       cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
     }
     .btn-details:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-edit {
+      background: #f0f8e8; border: 1px solid #c0dfa0; color: #3a8a1a;
+      border-radius: 5px; padding: 5px 10px; font-size: 11px;
+      font-family: 'Montserrat', sans-serif; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+    }
+    .btn-edit:hover { background: #3a8a1a; color: #fff; border-color: #3a8a1a; }
     .btn-del {
       background: #fdf0f0; border: 1px solid #f5c0c0; color: var(--danger);
       border-radius: 5px; padding: 5px 10px; font-size: 11px;
@@ -161,7 +168,8 @@
     .modal-overlay.open { display: flex; }
     .modal {
       background: var(--white); border-radius: 10px; padding: 32px;
-      width: 100%; max-width: 480px; box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+      width: 100%; max-width: 500px; box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+      max-height: 90vh; overflow-y: auto;
     }
     .modal-title {
       font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800;
@@ -172,6 +180,9 @@
       content: ''; display: inline-block; width: 4px; height: 18px;
       background: var(--sky); border-radius: 2px;
     }
+    .modal-section { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue);
+      margin: 16px 0 10px; }
     .detail-row {
       display: flex; gap: 12px; padding: 10px 0;
       border-bottom: 1px solid var(--border); align-items: baseline;
@@ -346,6 +357,66 @@
     </div>
   </div>
 
+  <!-- Modal Editar Reserva -->
+  <div class="modal-overlay" id="modal-editar">
+    <div class="modal">
+      <div class="modal-title">Editar Reserva</div>
+
+      <div class="modal-section">Espaço</div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="e-tipo" onchange="updateEditRoomOptions()">
+          <option value="sala">Sala de Aula</option>
+          <option value="auditorio">Auditório</option>
+          <option value="lab">Laboratório</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sala / Espaço</label>
+        <select id="e-sala"></select>
+      </div>
+
+      <div class="modal-section">Data e Horário</div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="e-data">
+      </div>
+      <div class="time-grid">
+        <div class="form-group">
+          <label>Início</label>
+          <input type="time" id="e-horario-inicio">
+        </div>
+        <div class="form-group">
+          <label>Fim (opcional)</label>
+          <input type="time" id="e-horario-fim">
+        </div>
+      </div>
+
+      <div class="modal-section">Informações</div>
+      <div class="form-group">
+        <label>Responsável / Solicitante</label>
+        <input type="text" id="e-favorecido" placeholder="Nome do responsável">
+      </div>
+      <div class="form-group">
+        <label>Curso / Evento</label>
+        <input type="text" id="e-evento" placeholder="Nome do evento ou curso">
+      </div>
+      <div class="form-group">
+        <label>Motivo</label>
+        <input type="text" id="e-motivo" placeholder="Motivo de uso">
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea id="e-observacoes" placeholder="Informações adicionais..."></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-fechar" onclick="fecharModal('modal-editar')">Cancelar</button>
+        <button class="btn-save" onclick="salvarEdicao()">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Alterar Senha -->
   <div class="modal-overlay" id="modal-senha">
     <div class="modal">
@@ -375,9 +446,10 @@
   <script src="js/auth.js"></script>
   <script>
     const TABELA = 'reservas';
-    let reservations = [];
-    let perfilAtual  = null;
-    let locaisMap    = {};
+    let reservations  = [];
+    let perfilAtual   = null;
+    let locaisMap     = {};
+    let editandoId    = null;
 
     window.addEventListener('load', async () => {
       perfilAtual = await protegerPagina(['admin', 'gerenciador', 'visualizador']);
@@ -404,17 +476,15 @@
       });
     });
 
-    // ── Log de atividade ─────────────────────────────────────
+    // ── Log ─────────────────────────────────────────────────
     async function registrarLog(acao, detalhe, tabela = 'reservas') {
       try {
         await db.from('logs').insert([{
           usuario_id:   perfilAtual?.id,
           usuario_nome: perfilAtual?.nome,
-          acao,
-          detalhe,
-          tabela
+          acao, detalhe, tabela
         }]);
-      } catch (e) { console.warn('Log falhou:', e); }
+      } catch(e) { console.warn('Log falhou:', e); }
     }
 
     // ── Locais ───────────────────────────────────────────────
@@ -443,6 +513,14 @@
       } else {
         motiGroup.style.display = 'none'; labEl.textContent = 'Curso / Evento'; favEl.textContent = 'Responsável / Solicitante';
       }
+    }
+
+    function updateEditRoomOptions() {
+      const tipo = document.getElementById('e-tipo').value;
+      const sel  = document.getElementById('e-sala');
+      const atual = sel.value;
+      sel.innerHTML = (locaisMap[tipo] || []).map(s => `<option value="${s}">${s}</option>`).join('');
+      if (atual) sel.value = atual;
     }
 
     // ── Reservas ─────────────────────────────────────────────
@@ -548,6 +626,63 @@
       }
     }
 
+    // ── Editar Reserva ───────────────────────────────────────
+    function abrirEditar(id) {
+      const r = reservations.find(r => String(r.id) === String(id));
+      if (!r) return;
+      editandoId = id;
+
+      document.getElementById('e-tipo').value           = r.tipo;
+      updateEditRoomOptions();
+      document.getElementById('e-sala').value           = r.sala;
+      document.getElementById('e-data').value           = r.data;
+      document.getElementById('e-horario-inicio').value = r.horario_inicio || '';
+      document.getElementById('e-horario-fim').value    = r.horario_fim    || '';
+      document.getElementById('e-favorecido').value     = r.favorecido     || '';
+      document.getElementById('e-evento').value         = r.evento         || '';
+      document.getElementById('e-motivo').value         = r.motivo         || '';
+      document.getElementById('e-observacoes').value    = r.observacoes    || '';
+
+      document.getElementById('modal-editar').classList.add('open');
+    }
+
+    async function salvarEdicao() {
+      const tipo = document.getElementById('e-tipo').value;
+      const sala = document.getElementById('e-sala').value;
+      const data = document.getElementById('e-data').value;
+      const hi   = document.getElementById('e-horario-inicio').value;
+      const hf   = document.getElementById('e-horario-fim').value;
+      const fav  = document.getElementById('e-favorecido').value.trim();
+      const ev   = document.getElementById('e-evento').value.trim();
+      const mot  = document.getElementById('e-motivo').value.trim();
+      const obs  = document.getElementById('e-observacoes').value.trim();
+
+      if (!data) { showToast('Selecione uma data.', 'error'); return; }
+      if (!hi)   { showToast('Informe o horário de início.', 'error'); return; }
+      if (!ev && !fav) { showToast('Informe o responsável ou o evento.', 'error'); return; }
+
+      const horario = hf ? `${hi} até ${hf}` : hi;
+
+      const { error } = await db.from(TABELA).update({
+        tipo, sala, data,
+        horario_inicio: hi, horario_fim: hf || null,
+        horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs
+      }).eq('id', editandoId);
+
+      if (error) { showToast('Erro ao salvar alterações.', 'error'); return; }
+
+      // Atualiza localmente
+      const idx = reservations.findIndex(r => String(r.id) === String(editandoId));
+      if (idx !== -1) {
+        reservations[idx] = { ...reservations[idx], tipo, sala, data, horario_inicio: hi, horario_fim: hf || null, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
+      }
+
+      renderList();
+      await registrarLog('EDITOU RESERVA', `${sala} em ${data} às ${horario} — ${ev || fav}`);
+      fecharModal('modal-editar');
+      showToast('Reserva atualizada com sucesso!', 'success');
+    }
+
     // ── Detalhes ─────────────────────────────────────────────
     function abrirDetalhes(id) {
       const r = reservations.find(r => String(r.id) === String(id));
@@ -578,7 +713,7 @@
 
     // ── Alterar Senha ────────────────────────────────────────
     function abrirAlterarSenha() {
-      document.getElementById('nova-senha').value     = '';
+      document.getElementById('nova-senha').value      = '';
       document.getElementById('confirmar-senha').value = '';
       document.getElementById('senha-erro').classList.remove('show');
       document.getElementById('modal-senha').classList.add('open');
@@ -588,7 +723,6 @@
       const nova      = document.getElementById('nova-senha').value;
       const confirmar = document.getElementById('confirmar-senha').value;
       const erro      = document.getElementById('senha-erro');
-
       erro.classList.remove('show');
 
       if (!nova || nova.length < 6) {
@@ -632,7 +766,7 @@
       list.sort((a, b) => a.data.localeCompare(b.data) || a.horario_inicio.localeCompare(b.horario_inicio));
 
       const container   = document.getElementById('reservations-list');
-      const podeExcluir = perfilAtual?.perfil === 'admin';
+      const isAdmin     = perfilAtual?.perfil === 'admin';
 
       document.getElementById('count-label').textContent =
         `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
@@ -665,7 +799,8 @@
                   <td style="color:var(--muted)">${r.favorecido || '—'}</td>
                   <td><div class="card-actions">
                     <button class="btn-details" onclick="abrirDetalhes(${r.id})">Detalhes</button>
-                    ${podeExcluir ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
+                    ${isAdmin ? `<button class="btn-edit" onclick="abrirEditar(${r.id})">Editar</button>` : ''}
+                    ${isAdmin ? `<button class="btn-del"  onclick="deleteReservation(${r.id})">Remover</button>` : ''}
                   </div></td>
                 </tr>`;
               }).join('')}
