@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FDV — Acesso ao Sistema</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --navy: #0e1a38;
+      --navy2: #162040;
+      --navy3: #1e2d55;
+      --blue: #1a6fc4;
+      --sky: #4eaee8;
+      --sky-lt: #e8f4fc;
+      --white: #ffffff;
+      --off: #f4f6fa;
+      --border: #dce3ef;
+      --text: #1a2340;
+      --muted: #6b7a99;
+      --danger: #d93a3a;
+      --success: #1a9e5c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--off);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar { background: var(--navy); height: 7px; }
+
+    header {
+      background: var(--navy);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      height: 68px;
+    }
+
+    .header-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav-strip {
+      background: var(--navy2);
+      border-bottom: 3px solid var(--blue);
+      height: 42px;
+    }
+
+    .login-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .login-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 24px rgba(14,26,56,0.08);
+    }
+
+    .login-card h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .login-card h1::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background: var(--sky);
+      border-radius: 2px;
+    }
+
+    .login-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-left: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.02em;
+    }
+
+    input {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Open Sans', sans-serif;
+      font-size: 13px;
+      padding: 10px 12px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26,111,196,0.12);
+      background: #fff;
+    }
+
+    input.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(217,58,58,0.12);
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 11px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover { background: #1560aa; }
+    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; }
+
+    .error-msg {
+      background: #fdf0f0;
+      border: 1px solid #f5c0c0;
+      border-radius: 6px;
+      color: var(--danger);
+      font-size: 12px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .error-msg.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <header>
+    <span class="header-title">FDV — Sistema de Reservas de Espaços</span>
+  </header>
+  <div class="nav-strip"></div>
+
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1>Acesso ao Sistema</h1>
+      <p class="login-subtitle">Informe suas credenciais para continuar</p>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <div class="error-msg" id="error-msg">E-mail ou senha incorretos. Tente novamente.</div>
+
+      <button class="btn-primary" id="btn-login" onclick="fazerLogin()">Entrar</button>
+    </div>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Se já estiver logado, redireciona direto
+    (async () => {
+      const session = await getSession();
+      if (session) {
+        const perfil = await getUserPerfil(session.user.id);
+        if (perfil) {
+          window.location.href = perfil.perfil === 'admin' ? 'admin.html' : 'reservas.html';
+        }
+      }
+    })();
+
+    async function fazerLogin() {
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+      const btn   = document.getElementById('btn-login');
+      const err   = document.getElementById('error-msg');
+
+      err.classList.remove('show');
+      document.getElementById('email').classList.remove('error');
+      document.getElementById('senha').classList.remove('error');
+
+      if (!email || !senha) {
+        err.textContent = 'Preencha e-mail e senha.';
+        err.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
+
+      if (error || !data.session) {
+        err.textContent = 'E-mail ou senha incorretos. Tente novamente.';
+        err.classList.add('show');
+        document.getElementById('email').classList.add('error');
+        document.getElementById('senha').classList.add('error');
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        return;
+      }
+
+      const perfil = await getUserPerfil(data.session.user.id);
+      window.location.href = perfil?.perfil === 'admin' ? 'admin.html' : 'reservas.html';
+    }
+
+    // Login ao pressionar Enter
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') fazerLogin();
+    });
+  </script>
+</body>
+</html>
