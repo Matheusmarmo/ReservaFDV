@@ -18,10 +18,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Open Sans', sans-serif; background: var(--off); color: var(--text); min-height: 100vh; }
     .topbar { background: var(--navy); height: 7px; }
-    header {
-      background: var(--navy); padding: 0 40px;
-      display: flex; align-items: center; height: 68px;
-    }
+    header { background: var(--navy); padding: 0 40px; display: flex; align-items: center; height: 68px; }
     .header-title {
       font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
       color: rgba(255,255,255,0.9); letter-spacing: 0.04em; text-transform: uppercase;
@@ -157,8 +154,6 @@
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 13px; line-height: 1.6; }
-
-    /* Modal de detalhes */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(14,26,56,0.5);
       display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -195,7 +190,6 @@
       padding: 9px 20px; cursor: pointer; transition: background 0.2s;
     }
     .btn-fechar:hover { background: var(--border); }
-
     .toast {
       position: fixed; bottom: 28px; right: 28px; background: var(--navy);
       color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px;
@@ -256,17 +250,17 @@
           <input type="date" id="data">
         </div>
         <div class="time-grid">
-  <div class="form-group">
-    <label for="horario_inicio">Início</label>
-    <select id="horario_inicio" onchange="toggleHorarioCustom('inicio')"></select>
-    <input type="text" id="horario_inicio_custom" placeholder="Ex: 08:00" style="display:none;margin-top:6px">
-  </div>
-  <div class="form-group">
-    <label for="horario_fim">Fim (opcional)</label>
-    <select id="horario_fim" onchange="toggleHorarioCustom('fim')"></select>
-    <input type="text" id="horario_fim_custom" placeholder="Ex: 10:00" style="display:none;margin-top:6px">
-  </div>
-</div>
+          <div class="form-group">
+            <label for="horario_inicio">Início</label>
+            <select id="horario_inicio" onchange="toggleHorarioCustom('inicio')"></select>
+            <input type="text" id="horario_inicio_custom" placeholder="Ex: 08:00" style="display:none;margin-top:6px">
+          </div>
+          <div class="form-group">
+            <label for="horario_fim">Fim (opcional)</label>
+            <select id="horario_fim" onchange="toggleHorarioCustom('fim')"></select>
+            <input type="text" id="horario_fim_custom" placeholder="Ex: 10:00" style="display:none;margin-top:6px">
+          </div>
+        </div>
       </div>
       <div>
         <div class="section-label">Informações</div>
@@ -305,7 +299,6 @@
           <span class="count-badge" id="count-label">0 reservas</span>
         </div>
       </div>
-
       <div class="filters">
         <div class="form-group">
           <label>Filtrar por Data</label>
@@ -325,14 +318,12 @@
           <input type="text" id="filter-text" placeholder="Evento, sala, responsável..." oninput="renderList()">
         </div>
       </div>
-
       <div id="reservations-list">
         <div class="empty-state"><div class="icon">📋</div><p>Carregando reservas...</p></div>
       </div>
     </main>
   </div>
 
-  <!-- Modal de Detalhes -->
   <div class="modal-overlay" id="modal-detalhes">
     <div class="modal">
       <div class="modal-title">Detalhes da Reserva</div>
@@ -380,20 +371,19 @@
 
       document.getElementById('data').value = new Date().toISOString().split('T')[0];
 
-     const hiSel = document.getElementById('horario_inicio');
-const hfSel = document.getElementById('horario_fim');
-HORARIOS.forEach(h => {
-  hiSel.innerHTML += `<option value="${h}">${h}</option>`;
-  hfSel.innerHTML += `<option value="${h}">${h}</option>`;
-});
-hiSel.innerHTML += `<option value="__outro__">Outro (digitar)</option>`;
-hfSel.innerHTML  = '<option value="">Sem fim definido</option>' + hfSel.innerHTML;
-hfSel.innerHTML += `<option value="__outro__">Outro (digitar)</option>`;
+      const hiSel = document.getElementById('horario_inicio');
+      const hfSel = document.getElementById('horario_fim');
+      HORARIOS.forEach(h => {
+        hiSel.innerHTML += `<option value="${h}">${h}</option>`;
+        hfSel.innerHTML += `<option value="${h}">${h}</option>`;
+      });
+      hiSel.innerHTML += `<option value="__outro__">✏️ Outro (digitar)</option>`;
+      hfSel.innerHTML  = '<option value="">Sem fim definido</option>' + hfSel.innerHTML;
+      hfSel.innerHTML += `<option value="__outro__">✏️ Outro (digitar)</option>`;
 
       await loadLocais();
       await fetchReservations();
 
-      // Fecha modal clicando fora
       document.getElementById('modal-detalhes').addEventListener('click', function(e) {
         if (e.target === this) fecharDetalhes();
       });
@@ -424,6 +414,26 @@ hfSel.innerHTML += `<option value="__outro__">Outro (digitar)</option>`;
       } else {
         motiGroup.style.display = 'none'; labEl.textContent = 'Curso / Evento'; favEl.textContent = 'Responsável / Solicitante';
       }
+    }
+
+    function toggleHorarioCustom(tipo) {
+      const sel    = document.getElementById(`horario_${tipo}`);
+      const custom = document.getElementById(`horario_${tipo}_custom`);
+      if (sel.value === '__outro__') {
+        custom.style.display = 'block';
+        custom.focus();
+      } else {
+        custom.style.display = 'none';
+        custom.value = '';
+      }
+    }
+
+    function getHorarioValue(tipo) {
+      const sel = document.getElementById(`horario_${tipo}`);
+      if (sel.value === '__outro__') {
+        return document.getElementById(`horario_${tipo}_custom`).value.trim();
+      }
+      return sel.value;
     }
 
     async function fetchReservations() {
@@ -466,27 +476,6 @@ hfSel.innerHTML += `<option value="__outro__">Outro (digitar)</option>`;
     function clearFieldErrors() {
       ['data','sala','tipo','horario_inicio','favorecido','evento'].forEach(id => setFieldError(id, false));
     }
-    function toggleHorarioCustom(tipo) {
-  const sel    = document.getElementById(`horario_${tipo}`);
-  const custom = document.getElementById(`horario_${tipo}_custom`);
-  if (sel.value === '__outro__') {
-    custom.style.display = 'block';
-    custom.focus();
-  } else {
-    custom.style.display = 'none';
-    custom.value = '';
-  }
-}
-
-function getHorarioValue(tipo) {
-  const sel = document.getElementById(`horario_${tipo}`);
-  if (sel.value === '__outro__') {
-    return document.getElementById(`horario_${tipo}_custom`).value.trim();
-  }
-  return sel.value;
-}
-
-async function addReservation() {
 
     async function addReservation() {
       if (perfilAtual?.perfil === 'visualizador') return;
@@ -494,14 +483,15 @@ async function addReservation() {
       const data = document.getElementById('data').value;
       const sala = document.getElementById('sala').value;
       const tipo = document.getElementById('tipo').value;
-      const hi = getHorarioValue('inicio');
-      const hf = getHorarioValue('fim');
+      const hi   = getHorarioValue('inicio');
+      const hf   = getHorarioValue('fim');
       const fav  = document.getElementById('favorecido').value.trim();
       const ev   = document.getElementById('evento').value.trim();
       const mot  = document.getElementById('motivo').value.trim();
       const obs  = document.getElementById('observacoes').value.trim();
 
       if (!data) { setFieldError('data', true); showToast('Selecione uma data.', 'error'); return; }
+      if (!hi)   { showToast('Informe o horário de início.', 'error'); return; }
       if (!ev && !fav) { setFieldError('favorecido', true); setFieldError('evento', true); showToast('Informe o responsável ou o evento.', 'error'); return; }
 
       const newSlots = getSlots(hi, hf);
@@ -526,6 +516,11 @@ async function addReservation() {
         renderList();
         showToast('Reserva adicionada com sucesso!', 'success');
         ['evento','favorecido','motivo','observacoes'].forEach(id => document.getElementById(id).value = '');
+        // Resetar selects de horário
+        document.getElementById('horario_inicio').selectedIndex = 0;
+        document.getElementById('horario_fim').selectedIndex = 0;
+        document.getElementById('horario_inicio_custom').style.display = 'none';
+        document.getElementById('horario_fim_custom').style.display = 'none';
         clearFieldErrors();
       } catch (err) {
         showToast('Erro ao salvar reserva.', 'error');
@@ -548,20 +543,18 @@ async function addReservation() {
     function abrirDetalhes(id) {
       const r = reservations.find(r => String(r.id) === String(id));
       if (!r) return;
-
       const [ano, mes, dia] = r.data.split('-');
       const dataFmt = `${dia}/${mes}/${ano}`;
       const tipos   = { sala: 'Sala de Aula', auditorio: 'Auditório', lab: 'Laboratório' };
-
-      const campos = [
+      const campos  = [
         { label: 'Data',         val: dataFmt },
         { label: 'Horário',      val: r.horario },
         { label: 'Espaço',       val: r.sala },
         { label: 'Tipo',         val: tipos[r.tipo] || r.tipo },
-        { label: 'Evento/Curso', val: r.evento  || '—' },
+        { label: 'Evento/Curso', val: r.evento     || '—' },
         { label: 'Responsável',  val: r.favorecido || '—' },
-        r.motivo      ? { label: 'Motivo',       val: r.motivo }      : null,
-        r.observacoes ? { label: 'Observações',  val: r.observacoes } : null,
+        r.motivo      ? { label: 'Motivo',      val: r.motivo }      : null,
+        r.observacoes ? { label: 'Observações', val: r.observacoes } : null,
       ].filter(Boolean);
 
       document.getElementById('modal-detalhes-body').innerHTML =
