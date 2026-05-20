@@ -20,7 +20,7 @@
     .topbar { background: var(--navy); height: 7px; }
     header {
       background: var(--navy); padding: 0 40px;
-      display: flex; align-items: center; gap: 0; height: 68px; position: relative;
+      display: flex; align-items: center; height: 68px;
     }
     .header-title {
       font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
@@ -92,9 +92,7 @@
     .btn-primary:hover { background: #1560aa; }
     .btn-primary:active { transform: scale(0.98); }
     .content-area { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
-    .content-header {
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    }
+    .content-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
     .content-title {
       font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800;
       color: var(--navy); text-transform: uppercase; letter-spacing: 0.03em;
@@ -114,8 +112,7 @@
     }
     .filters .form-group { flex: 1; min-width: 140px; }
     .reservations-wrap {
-      background: var(--white); border: 1px solid var(--border); border-radius: 8px;
-      overflow: hidden;
+      background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
     }
     .res-table { width: 100%; border-collapse: collapse; }
     .res-table th {
@@ -129,20 +126,7 @@
       border-bottom: 1px solid var(--border); vertical-align: middle;
     }
     .res-table tr:last-child td { border-bottom: none; }
-    .res-row.has-details { cursor: pointer; }
-    .res-row:hover td { background: var(--sky-lt); }
-    .details-row td { background: #f8fbff !important; }
-    .details-box {
-      padding: 12px 20px 14px 48px;
-      display: flex; flex-direction: column; gap: 6px;
-      border-top: 1px dashed var(--border);
-    }
-    .detail-item { display: flex; gap: 10px; font-size: 12px; align-items: baseline; }
-    .detail-label {
-      font-family: 'Montserrat', sans-serif; font-weight: 700;
-      font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
-      color: var(--blue); min-width: 90px;
-    }
+    .res-table tbody tr:hover td { background: var(--sky-lt); }
     .type-badge {
       font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
       text-transform: uppercase; padding: 2px 7px; border-radius: 20px;
@@ -155,6 +139,13 @@
       background: var(--sky-lt); color: var(--blue);
       border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600;
     }
+    .btn-details {
+      background: var(--sky-lt); border: 1px solid #b8d8f0; color: var(--blue);
+      border-radius: 5px; padding: 5px 10px; font-size: 11px;
+      font-family: 'Montserrat', sans-serif; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+    }
+    .btn-details:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
     .btn-del {
       background: #fdf0f0; border: 1px solid #f5c0c0; color: var(--danger);
       border-radius: 5px; padding: 5px 10px; font-size: 11px;
@@ -162,9 +153,49 @@
       cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
     }
     .btn-del:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .card-actions { display: flex; gap: 6px; }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 13px; line-height: 1.6; }
+
+    /* Modal de detalhes */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(14,26,56,0.5);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 10px; padding: 32px;
+      width: 100%; max-width: 480px; box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+    .modal-title {
+      font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800;
+      color: var(--navy); text-transform: uppercase; letter-spacing: 0.04em;
+      margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
+    }
+    .modal-title::before {
+      content: ''; display: inline-block; width: 4px; height: 18px;
+      background: var(--sky); border-radius: 2px;
+    }
+    .detail-row {
+      display: flex; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--border); align-items: baseline;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key {
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); min-width: 110px;
+    }
+    .detail-val { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; }
+    .btn-fechar {
+      background: var(--off); color: var(--muted); border: 1px solid var(--border);
+      font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase; border-radius: 5px;
+      padding: 9px 20px; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-fechar:hover { background: var(--border); }
+
     .toast {
       position: fixed; bottom: 28px; right: 28px; background: var(--navy);
       color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px;
@@ -299,6 +330,17 @@
     </main>
   </div>
 
+  <!-- Modal de Detalhes -->
+  <div class="modal-overlay" id="modal-detalhes">
+    <div class="modal">
+      <div class="modal-title">Detalhes da Reserva</div>
+      <div id="modal-detalhes-body"></div>
+      <div class="modal-footer">
+        <button class="btn-fechar" onclick="fecharDetalhes()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">
     <span class="toast-icon" id="toast-icon">✓</span>
     <span id="toast-msg"></span>
@@ -346,6 +388,11 @@
 
       await loadLocais();
       await fetchReservations();
+
+      // Fecha modal clicando fora
+      document.getElementById('modal-detalhes').addEventListener('click', function(e) {
+        if (e.target === this) fecharDetalhes();
+      });
     });
 
     async function loadLocais() {
@@ -473,12 +520,37 @@
       }
     }
 
-    function toggleDetalhes(id) {
-      const row  = document.getElementById(`details-${id}`);
-      const icon = document.getElementById(`icon-${id}`);
-      const open = row.style.display === 'none';
-      row.style.display    = open ? 'table-row' : 'none';
-      icon.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+    function abrirDetalhes(id) {
+      const r = reservations.find(r => String(r.id) === String(id));
+      if (!r) return;
+
+      const [ano, mes, dia] = r.data.split('-');
+      const dataFmt = `${dia}/${mes}/${ano}`;
+      const tipos   = { sala: 'Sala de Aula', auditorio: 'Auditório', lab: 'Laboratório' };
+
+      const campos = [
+        { label: 'Data',         val: dataFmt },
+        { label: 'Horário',      val: r.horario },
+        { label: 'Espaço',       val: r.sala },
+        { label: 'Tipo',         val: tipos[r.tipo] || r.tipo },
+        { label: 'Evento/Curso', val: r.evento  || '—' },
+        { label: 'Responsável',  val: r.favorecido || '—' },
+        r.motivo      ? { label: 'Motivo',       val: r.motivo }      : null,
+        r.observacoes ? { label: 'Observações',  val: r.observacoes } : null,
+      ].filter(Boolean);
+
+      document.getElementById('modal-detalhes-body').innerHTML =
+        campos.map(c => `
+          <div class="detail-row">
+            <span class="detail-key">${c.label}</span>
+            <span class="detail-val">${c.val}</span>
+          </div>`).join('');
+
+      document.getElementById('modal-detalhes').classList.add('open');
+    }
+
+    function fecharDetalhes() {
+      document.getElementById('modal-detalhes').classList.remove('open');
     }
 
     function renderList() {
@@ -496,9 +568,8 @@
       );
       list.sort((a, b) => a.data.localeCompare(b.data) || a.horario_inicio.localeCompare(b.horario_inicio));
 
-      const container  = document.getElementById('reservations-list');
+      const container   = document.getElementById('reservations-list');
       const podeExcluir = perfilAtual?.perfil === 'admin';
-      const totalCols  = podeExcluir ? 8 : 7;
 
       document.getElementById('count-label').textContent =
         `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
@@ -513,49 +584,34 @@
           <table class="res-table">
             <thead>
               <tr>
-                <th style="width:32px"></th>
                 <th>Data</th>
                 <th>Horário</th>
                 <th>Espaço</th>
                 <th>Tipo</th>
                 <th>Evento / Curso</th>
                 <th>Responsável</th>
-                ${podeExcluir ? '<th></th>' : ''}
+                <th></th>
               </tr>
             </thead>
             <tbody>
               ${list.map(r => {
                 const [ano, mes, dia] = r.data.split('-');
-                const dataFmt  = `${dia}/${mes}/${ano}`;
-                const typeLbl  = r.tipo === 'sala' ? 'Sala' : r.tipo === 'auditorio' ? 'Auditório' : 'Lab';
-                const temDetalhes = r.observacoes || r.motivo;
-                return `
-                  <tr class="res-row ${temDetalhes ? 'has-details' : ''}"
-                      onclick="${temDetalhes ? `toggleDetalhes(${r.id})` : ''}">
-                    <td style="text-align:center;color:var(--muted)">
-                      ${temDetalhes
-                        ? `<span id="icon-${r.id}" style="display:inline-block;transition:transform .2s;font-size:10px">▶</span>`
-                        : ''}
-                    </td>
-                    <td style="white-space:nowrap;font-weight:600">${dataFmt}</td>
-                    <td><span class="time-badge">⏱ ${r.horario}</span></td>
-                    <td style="font-weight:600">${r.sala}</td>
-                    <td><span class="type-badge type-${r.tipo}">${typeLbl}</span></td>
-                    <td>${r.evento || '—'}</td>
-                    <td style="color:var(--muted)">${r.favorecido || '—'}</td>
-                    ${podeExcluir
-                      ? `<td><button class="btn-del" onclick="event.stopPropagation();deleteReservation(${r.id})">Remover</button></td>`
-                      : ''}
-                  </tr>
-                  ${temDetalhes ? `
-                  <tr class="details-row" id="details-${r.id}" style="display:none">
-                    <td colspan="${totalCols}" style="padding:0">
-                      <div class="details-box">
-                        ${r.motivo     ? `<div class="detail-item"><span class="detail-label">Motivo</span><span>${r.motivo}</span></div>` : ''}
-                        ${r.observacoes? `<div class="detail-item"><span class="detail-label">Observações</span><span>${r.observacoes}</span></div>` : ''}
-                      </div>
-                    </td>
-                  </tr>` : ''}`;
+                const dataFmt = `${dia}/${mes}/${ano}`;
+                const typeLbl = r.tipo === 'sala' ? 'Sala' : r.tipo === 'auditorio' ? 'Auditório' : 'Lab';
+                return `<tr>
+                  <td style="white-space:nowrap;font-weight:600">${dataFmt}</td>
+                  <td><span class="time-badge">⏱ ${r.horario}</span></td>
+                  <td style="font-weight:600">${r.sala}</td>
+                  <td><span class="type-badge type-${r.tipo}">${typeLbl}</span></td>
+                  <td>${r.evento || '—'}</td>
+                  <td style="color:var(--muted)">${r.favorecido || '—'}</td>
+                  <td>
+                    <div class="card-actions">
+                      <button class="btn-details" onclick="abrirDetalhes(${r.id})">Detalhes</button>
+                      ${podeExcluir ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
+                    </div>
+                  </td>
+                </tr>`;
               }).join('')}
             </tbody>
           </table>
