@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FDV — Administração</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --navy:#0e1a38;--navy2:#162040;--navy3:#1e2d55;
+      --blue:#1a6fc4;--sky:#4eaee8;--sky-lt:#e8f4fc;
+      --white:#ffffff;--off:#f4f6fa;--border:#dce3ef;
+      --text:#1a2340;--muted:#6b7a99;--danger:#d93a3a;--success:#1a9e5c;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Open Sans',sans-serif;background:var(--off);color:var(--text);min-height:100vh;}
+    .topbar{background:var(--navy);height:7px;}
+    header{background:var(--navy);padding:0 40px;display:flex;align-items:center;height:68px;}
+    .header-title{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;color:rgba(255,255,255,0.9);letter-spacing:.04em;text-transform:uppercase;}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:16px;}
+    .header-user{font-size:12px;color:rgba(255,255,255,0.6);}
+    .btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);border-radius:5px;padding:5px 12px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:all .2s;}
+    .btn-logout:hover{border-color:rgba(255,255,255,0.6);color:#fff;}
+    .nav-strip{background:var(--navy2);border-bottom:3px solid var(--blue);padding:0 40px;display:flex;align-items:center;height:42px;gap:4px;}
+    .nav-strip a{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;padding:0 14px;height:100%;display:flex;align-items:center;border-bottom:3px solid transparent;margin-bottom:-3px;transition:color .2s,border-color .2s;}
+    .nav-strip a:hover{color:#fff;}
+    .nav-strip a.active{color:#fff;border-bottom-color:var(--sky);}
+    .page{padding:32px 40px;display:flex;flex-direction:column;gap:24px;}
+    .page-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.03em;display:flex;align-items:center;gap:8px;}
+    .page-title::before{content:'';display:inline-block;width:4px;height:22px;background:var(--sky);border-radius:2px;}
+    .tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);}
+    .tab{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:10px 20px;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;}
+    .tab:hover{color:var(--navy);}
+    .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+    .card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:24px;}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .card-title{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+    table{width:100%;border-collapse:collapse;}
+    th{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);background:var(--off);}
+    td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:var(--sky-lt);}
+    .badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-family:'Montserrat',sans-serif;}
+    .badge-admin{background:#fff3e0;color:#e65100;}
+    .badge-gerenciador{background:#e8f0fc;color:#1a4fc4;}
+    .badge-visualizador{background:#f0f0f0;color:#666;}
+    .badge-sala{background:#e8f0fc;color:#1a4fc4;}
+    .badge-auditorio{background:#f0e8fc;color:#7a1ac4;}
+    .badge-lab{background:#e8fcf0;color:#1a9e5c;}
+    .badge-ativo{background:#e8fcf0;color:#1a9e5c;}
+    .badge-inativo{background:#fdf0f0;color:#d93a3a;}
+    .btn{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:6px 12px;cursor:pointer;transition:all .2s;}
+    .btn-primary{background:var(--blue);color:#fff;border:none;}
+    .btn-primary:hover{background:#1560aa;}
+    .btn-edit{background:var(--sky-lt);color:var(--blue);border:1px solid #b8d8f0;}
+    .btn-edit:hover{background:var(--blue);color:#fff;}
+    .btn-del{background:#fdf0f0;color:var(--danger);border:1px solid #f5c0c0;}
+    .btn-del:hover{background:var(--danger);color:#fff;}
+    .actions{display:flex;gap:6px;}
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(14,26,56,0.5);display:none;align-items:center;justify-content:center;z-index:1000;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:var(--white);border-radius:10px;padding:32px;width:100%;max-width:460px;box-shadow:0 8px 40px rgba(0,0,0,0.2);}
+    .modal-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:24px;display:flex;align-items:center;gap:8px;}
+    .modal-title::before{content:'';display:inline-block;width:4px;height:18px;background:var(--sky);border-radius:2px;}
+    .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+    label{font-size:12px;font-weight:600;color:var(--muted);font-family:'Montserrat',sans-serif;letter-spacing:.02em;}
+    input,select{background:var(--off);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:'Open Sans',sans-serif;font-size:13px;padding:9px 12px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s;}
+    input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,111,196,0.12);background:#fff;}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+    .btn-cancel{background:var(--off);color:var(--muted);border:1px solid var(--border);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:9px 18px;cursor:pointer;}
+    .btn-cancel:hover{background:var(--border);}
+    .btn-save{background:var(--blue);color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:9px 18px;cursor:pointer;}
+    .btn-save:hover{background:#1560aa;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--navy);color:#fff;border-radius:8px;padding:12px 20px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.2);opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;pointer-events:none;max-width:400px;z-index:9999;}
+    .toast.show{opacity:1;transform:translateY(0);}
+    .toast.success .ti{color:var(--success);}
+    .toast.error .ti{color:var(--danger);}
+    .empty-row td{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <header>
+    <span class="header-title">FDV — Administração</span>
+    <div class="header-right">
+      <span class="header-user" id="header-user"></span>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </header>
+  <div class="nav-strip">
+    <a href="reservas.html">Reservas</a>
+    <a href="admin.html" class="active">Administração</a>
+  </div>
+
+  <div class="page">
+    <div class="page-title">Painel do Administrador</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('usuarios')">Usuários</button>
+      <button class="tab" onclick="switchTab('locais')">Locais</button>
+    </div>
+
+    <!-- ABA: USUÁRIOS -->
+    <div class="tab-content active" id="tab-usuarios">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Usuários do Sistema</span>
+          <button class="btn btn-primary" onclick="abrirModalUsuario()">+ Novo Usuário</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tbody-usuarios">
+            <tr class="empty-row"><td colspan="5">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA: LOCAIS -->
+    <div class="tab-content" id="tab-locais">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Locais e Espaços</span>
+          <button class="btn btn-primary" onclick="abrirModalLocal()">+ Novo Local</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Nome</th><th>Tipo</th><th>Status</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tbody-locais">
+            <tr class="empty-row"><td colspan="4">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: USUÁRIO -->
+  <div class="modal-overlay" id="modal-usuario">
+    <div class="modal">
+      <div class="modal-title" id="modal-usuario-title">Novo Usuário</div>
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="u-nome" placeholder="Nome do usuário">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="u-email" placeholder="email@fdv.br">
+      </div>
+      <div class="form-group" id="u-senha-group">
+        <label>Senha inicial</label>
+        <input type="password" id="u-senha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="form-group">
+        <label>Perfil</label>
+        <select id="u-perfil">
+          <option value="visualizador">Visualizador</option>
+          <option value="gerenciador">Gerenciador</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div class="form-group" id="u-ativo-group" style="display:none">
+        <label>Status</label>
+        <select id="u-ativo">
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="fecharModal('modal-usuario')">Cancelar</button>
+        <button class="btn-save" onclick="salvarUsuario()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOCAL -->
+  <div class="modal-overlay" id="modal-local">
+    <div class="modal">
+      <div class="modal-title" id="modal-local-title">Novo Local</div>
+      <div class="form-group">
+        <label>Nome do espaço</label>
+        <input type="text" id="l-nome" placeholder="Ex: Sala 101">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="l-tipo">
+          <option value="sala">Sala de Aula</option>
+          <option value="auditorio">Auditório</option>
+          <option value="lab">Laboratório</option>
+        </select>
+      </div>
+      <div class="form-group" id="l-ativo-group" style="display:none">
+        <label>Status</label>
+        <select id="l-ativo">
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="fecharModal('modal-local')">Cancelar</button>
+        <button class="btn-save" onclick="salvarLocal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="ti" id="ti">✓</span>
+    <span id="tm"></span>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let editandoUsuarioId = null;
+    let editandoLocalId   = null;
+
+    // ── Init ────────────────────────────────────────────────
+    window.addEventListener('load', async () => {
+      const perfil = await protegerPagina(['admin']);
+      if (!perfil) return;
+
+      document.getElementById('header-user').textContent = perfil.nome;
+      await carregarUsuarios();
+      await carregarLocais();
+    });
+
+    // ── Tabs ────────────────────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        const names = ['usuarios','locais'];
+        t.classList.toggle('active', names[i] === tab);
+      });
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    // ── Usuários ────────────────────────────────────────────
+    async function carregarUsuarios() {
+      const { data, error } = await db.from('profiles').select('*').order('nome');
+      const tbody = document.getElementById('tbody-usuarios');
+      if (error || !data?.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Nenhum usuário encontrado.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(u => `
+        <tr>
+          <td><strong>${u.nome}</strong></td>
+          <td>${u.email}</td>
+          <td><span class="badge badge-${u.perfil}">${u.perfil}</span></td>
+          <td><span class="badge ${u.ativo ? 'badge-ativo' : 'badge-inativo'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+          <td><div class="actions">
+            <button class="btn btn-edit" onclick="abrirModalUsuario('${u.id}','${u.nome}','${u.email}','${u.perfil}',${u.ativo})">Editar</button>
+            <button class="btn btn-del"  onclick="excluirUsuario('${u.id}','${u.nome}')">Excluir</button>
+          </div></td>
+        </tr>`).join('');
+    }
+
+    function abrirModalUsuario(id, nome, email, perfil, ativo) {
+      editandoUsuarioId = id || null;
+      const isNovo = !id;
+      document.getElementById('modal-usuario-title').textContent = isNovo ? 'Novo Usuário' : 'Editar Usuário';
+      document.getElementById('u-nome').value   = nome  || '';
+      document.getElementById('u-email').value  = email || '';
+      document.getElementById('u-senha').value  = '';
+      document.getElementById('u-perfil').value = perfil || 'visualizador';
+      document.getElementById('u-senha-group').style.display  = isNovo ? 'flex' : 'none';
+      document.getElementById('u-ativo-group').style.display  = isNovo ? 'none' : 'flex';
+      if (!isNovo) document.getElementById('u-ativo').value = String(ativo);
+      document.getElementById('modal-usuario').classList.add('open');
+    }
+
+    async function salvarUsuario() {
+      const nome  = document.getElementById('u-nome').value.trim();
+      const email = document.getElementById('u-email').value.trim();
+      const senha = document.getElementById('u-senha').value;
+      const perfil= document.getElementById('u-perfil').value;
+      const ativo = document.getElementById('u-ativo').value === 'true';
+
+      if (!nome || !email) { showToast('Preencha nome e e-mail.', 'error'); return; }
+
+      if (!editandoUsuarioId) {
+        // Novo usuário via Admin API (Edge Function)
+        if (!senha || senha.length < 6) { showToast('Senha deve ter ao menos 6 caracteres.', 'error'); return; }
+        const { data, error } = await db.auth.signUp({
+          email, password: senha,
+          options: { data: { nome, perfil } }
+        });
+        if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); return; }
+      } else {
+        // Editar perfil existente
+        const { error } = await db.from('profiles')
+          .update({ nome, perfil, ativo })
+          .eq('id', editandoUsuarioId);
+        if (error) { showToast('Erro ao atualizar usuário.', 'error'); return; }
+      }
+
+      fecharModal('modal-usuario');
+      await carregarUsuarios();
+      showToast(editandoUsuarioId ? 'Usuário atualizado!' : 'Usuário criado! Um e-mail de confirmação foi enviado.', 'success', 5000);
+    }
+
+    async function excluirUsuario(id, nome) {
+      if (!confirm(`Excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return;
+      const { error } = await db.from('profiles').delete().eq('id', id);
+      if (error) { showToast('Erro ao excluir usuário.', 'error'); return; }
+      await carregarUsuarios();
+      showToast('Usuário excluído.', 'success');
+    }
+
+    // ── Locais ───────────────────────────────────────────────
+    async function carregarLocais() {
+      const { data, error } = await db.from('locais').select('*').order('tipo').order('nome');
+      const tbody = document.getElementById('tbody-locais');
+      if (error || !data?.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Nenhum local encontrado.</td></tr>';
+        return;
+      }
+      const tipos = { sala: 'Sala', auditorio: 'Auditório', lab: 'Laboratório' };
+      tbody.innerHTML = data.map(l => `
+        <tr>
+          <td><strong>${l.nome}</strong></td>
+          <td><span class="badge badge-${l.tipo}">${tipos[l.tipo]||l.tipo}</span></td>
+          <td><span class="badge ${l.ativo ? 'badge-ativo' : 'badge-inativo'}">${l.ativo ? 'Ativo' : 'Inativo'}</span></td>
+          <td><div class="actions">
+            <button class="btn btn-edit" onclick="abrirModalLocal(${l.id},'${l.nome}','${l.tipo}',${l.ativo})">Editar</button>
+            <button class="btn btn-del"  onclick="excluirLocal(${l.id},'${l.nome}')">Excluir</button>
+          </div></td>
+        </tr>`).join('');
+    }
+
+    function abrirModalLocal(id, nome, tipo, ativo) {
+      editandoLocalId = id || null;
+      const isNovo = !id;
+      document.getElementById('modal-local-title').textContent = isNovo ? 'Novo Local' : 'Editar Local';
+      document.getElementById('l-nome').value = nome || '';
+      document.getElementById('l-tipo').value = tipo || 'sala';
+      document.getElementById('l-ativo-group').style.display = isNovo ? 'none' : 'flex';
+      if (!isNovo) document.getElementById('l-ativo').value = String(ativo);
+      document.getElementById('modal-local').classList.add('open');
+    }
+
+    async function salvarLocal() {
+      const nome = document.getElementById('l-nome').value.trim();
+      const tipo = document.getElementById('l-tipo').value;
+      const ativo = document.getElementById('l-ativo').value === 'true';
+
+      if (!nome) { showToast('Informe o nome do local.', 'error'); return; }
+
+      if (!editandoLocalId) {
+        const { error } = await db.from('locais').insert([{ nome, tipo }]);
+        if (error) { showToast('Erro ao criar local.', 'error'); return; }
+      } else {
+        const { error } = await db.from('locais').update({ nome, tipo, ativo }).eq('id', editandoLocalId);
+        if (error) { showToast('Erro ao atualizar local.', 'error'); return; }
+      }
+
+      fecharModal('modal-local');
+      await carregarLocais();
+      showToast(editandoLocalId ? 'Local atualizado!' : 'Local criado!', 'success');
+    }
+
+    async function excluirLocal(id, nome) {
+      if (!confirm(`Excluir o local "${nome}"? As reservas existentes não serão afetadas.`)) return;
+      const { error } = await db.from('locais').delete().eq('id', id);
+      if (error) { showToast('Erro ao excluir local.', 'error'); return; }
+      await carregarLocais();
+      showToast('Local excluído.', 'success');
+    }
+
+    // ── Utilitários ──────────────────────────────────────────
+    function fecharModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // Fecha modal clicando fora
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+    });
+
+    let _tt = null;
+    function showToast(msg, type = 'success', duration = 3500) {
+      const t = document.getElementById('toast');
+      if (_tt) clearTimeout(_tt);
+      t.className = `toast show ${type}`;
+      document.getElementById('ti').textContent = type === 'success' ? '✓' : '✕';
+      document.getElementById('tm').textContent = msg;
+      _tt = setTimeout(() => { t.className = 'toast'; }, duration);
+    }
+  </script>
+</body>
+</html>
