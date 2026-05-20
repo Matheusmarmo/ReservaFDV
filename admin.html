@@ -18,10 +18,10 @@
     .topbar{background:var(--navy);height:7px;}
     header{background:var(--navy);padding:0 40px;display:flex;align-items:center;height:68px;}
     .header-title{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;color:rgba(255,255,255,0.9);letter-spacing:.04em;text-transform:uppercase;}
-    .header-right{margin-left:auto;display:flex;align-items:center;gap:16px;}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
     .header-user{font-size:12px;color:rgba(255,255,255,0.6);}
-    .btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);border-radius:5px;padding:5px 12px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:all .2s;}
-    .btn-logout:hover{border-color:rgba(255,255,255,0.6);color:#fff;}
+    .btn-header{background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);border-radius:5px;padding:5px 12px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:all .2s;}
+    .btn-header:hover{border-color:rgba(255,255,255,0.6);color:#fff;}
     .nav-strip{background:var(--navy2);border-bottom:3px solid var(--blue);padding:0 40px;display:flex;align-items:center;height:42px;gap:4px;}
     .nav-strip a{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;padding:0 14px;height:100%;display:flex;align-items:center;border-bottom:3px solid transparent;margin-bottom:-3px;transition:color .2s,border-color .2s;}
     .nav-strip a:hover{color:#fff;}
@@ -36,8 +36,9 @@
     .tab-content{display:none;}
     .tab-content.active{display:block;}
     .card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:24px;}
-    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
     .card-title{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+    .card-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     table{width:100%;border-collapse:collapse;}
     th{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);background:var(--off);}
     td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
@@ -52,6 +53,10 @@
     .badge-lab{background:#e8fcf0;color:#1a9e5c;}
     .badge-ativo{background:#e8fcf0;color:#1a9e5c;}
     .badge-inativo{background:#fdf0f0;color:#d93a3a;}
+    .badge-criou{background:#e8fcf0;color:#1a9e5c;}
+    .badge-removeu{background:#fdf0f0;color:#d93a3a;}
+    .badge-editou{background:#e8f0fc;color:#1a4fc4;}
+    .badge-alterou{background:#fff3e0;color:#e65100;}
     .btn{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:6px 12px;cursor:pointer;transition:all .2s;}
     .btn-primary{background:var(--blue);color:#fff;border:none;}
     .btn-primary:hover{background:#1560aa;}
@@ -60,7 +65,6 @@
     .btn-del{background:#fdf0f0;color:var(--danger);border:1px solid #f5c0c0;}
     .btn-del:hover{background:var(--danger);color:#fff;}
     .actions{display:flex;gap:6px;}
-    /* Modal */
     .modal-overlay{position:fixed;inset:0;background:rgba(14,26,56,0.5);display:none;align-items:center;justify-content:center;z-index:1000;}
     .modal-overlay.open{display:flex;}
     .modal{background:var(--white);border-radius:10px;padding:32px;width:100%;max-width:460px;box-shadow:0 8px 40px rgba(0,0,0,0.2);}
@@ -75,11 +79,16 @@
     .btn-cancel:hover{background:var(--border);}
     .btn-save{background:var(--blue);color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:9px 18px;cursor:pointer;}
     .btn-save:hover{background:#1560aa;}
+    .error-msg{background:#fdf0f0;border:1px solid #f5c0c0;border-radius:6px;color:var(--danger);font-size:12px;padding:10px 12px;margin-top:8px;display:none;}
+    .error-msg.show{display:block;}
+    .log-acao{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;}
+    .empty-row td{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
     .toast{position:fixed;bottom:28px;right:28px;background:var(--navy);color:#fff;border-radius:8px;padding:12px 20px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.2);opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;pointer-events:none;max-width:400px;z-index:9999;}
     .toast.show{opacity:1;transform:translateY(0);}
     .toast.success .ti{color:var(--success);}
     .toast.error .ti{color:var(--danger);}
-    .empty-row td{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+    select.filter-sm{width:auto;padding:6px 10px;font-size:12px;}
+    input.filter-sm{width:200px;padding:6px 10px;font-size:12px;}
   </style>
 </head>
 <body>
@@ -88,7 +97,8 @@
     <span class="header-title">FDV — Administração</span>
     <div class="header-right">
       <span class="header-user" id="header-user"></span>
-      <button class="btn-logout" onclick="logout()">Sair</button>
+      <button class="btn-header" onclick="abrirAlterarSenha()">🔑 Alterar Senha</button>
+      <button class="btn-header" onclick="logout()">Sair</button>
     </div>
   </header>
   <div class="nav-strip">
@@ -102,6 +112,7 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('usuarios')">Usuários</button>
       <button class="tab" onclick="switchTab('locais')">Locais</button>
+      <button class="tab" onclick="switchTab('logs')">Log de Atividades</button>
     </div>
 
     <!-- ABA: USUÁRIOS -->
@@ -134,6 +145,35 @@
             <tr><th>Nome</th><th>Tipo</th><th>Status</th><th>Ações</th></tr>
           </thead>
           <tbody id="tbody-locais">
+            <tr class="empty-row"><td colspan="4">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA: LOGS -->
+    <div class="tab-content" id="tab-logs">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Log de Atividades</span>
+          <div class="card-filters">
+            <input type="date" id="log-filter-date" class="filter-sm" oninput="renderLogs()">
+            <select id="log-filter-acao" class="filter-sm" onchange="renderLogs()">
+              <option value="">Todas as ações</option>
+              <option value="CRIOU">Criações</option>
+              <option value="REMOVEU">Remoções</option>
+              <option value="EDITOU">Edições</option>
+              <option value="ALTEROU">Alterações</option>
+            </select>
+            <input type="text" id="log-filter-text" class="filter-sm" placeholder="Buscar usuário..." oninput="renderLogs()">
+            <button class="btn btn-primary" onclick="carregarLogs()">↻ Atualizar</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Detalhe</th></tr>
+          </thead>
+          <tbody id="tbody-logs">
             <tr class="empty-row"><td colspan="4">Carregando...</td></tr>
           </tbody>
         </table>
@@ -209,39 +249,118 @@
     </div>
   </div>
 
+  <!-- MODAL: ALTERAR SENHA -->
+  <div class="modal-overlay" id="modal-senha">
+    <div class="modal">
+      <div class="modal-title">Alterar Senha</div>
+      <div class="form-group">
+        <label>Nova Senha</label>
+        <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="form-group">
+        <label>Confirmar Nova Senha</label>
+        <input type="password" id="confirmar-senha" placeholder="Repita a nova senha">
+      </div>
+      <div class="error-msg" id="senha-erro"></div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="fecharModal('modal-senha')">Cancelar</button>
+        <button class="btn-save" onclick="salvarSenha()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">
     <span class="ti" id="ti">✓</span>
     <span id="tm"></span>
   </div>
 
   <script src="js/supabase.js"></script>
-<script src="js/auth.js"></script>
-<script>
-  // Cliente secundário para criar usuários sem afetar a sessão do admin
-  const dbUser = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-  });
+  <script src="js/auth.js"></script>
+  <script>
     let editandoUsuarioId = null;
     let editandoLocalId   = null;
+    let perfilAtual       = null;
+    let todosLogs         = [];
 
     // ── Init ────────────────────────────────────────────────
     window.addEventListener('load', async () => {
-      const perfil = await protegerPagina(['admin']);
-      if (!perfil) return;
+      perfilAtual = await protegerPagina(['admin']);
+      if (!perfilAtual) return;
 
-      document.getElementById('header-user').textContent = perfil.nome;
+      document.getElementById('header-user').textContent = perfilAtual.nome;
       await carregarUsuarios();
       await carregarLocais();
+
+      document.querySelectorAll('.modal-overlay').forEach(o => {
+        o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+      });
     });
+
+    // ── Log ─────────────────────────────────────────────────
+    async function registrarLog(acao, detalhe, tabela = 'sistema') {
+      try {
+        await db.from('logs').insert([{
+          usuario_id:   perfilAtual?.id,
+          usuario_nome: perfilAtual?.nome,
+          acao, detalhe, tabela
+        }]);
+      } catch(e) { console.warn('Log falhou:', e); }
+    }
+
+    async function carregarLogs() {
+      const { data, error } = await db
+        .from('logs').select('*')
+        .order('created_at', { ascending: false })
+        .limit(500);
+      const tbody = document.getElementById('tbody-logs');
+      if (error || !data?.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Nenhuma atividade registrada.</td></tr>';
+        return;
+      }
+      todosLogs = data;
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const fDate = document.getElementById('log-filter-date').value;
+      const fAcao = document.getElementById('log-filter-acao').value.toUpperCase();
+      const fText = document.getElementById('log-filter-text').value.toLowerCase();
+
+      let list = [...todosLogs];
+      if (fDate) list = list.filter(l => l.created_at.startsWith(fDate));
+      if (fAcao) list = list.filter(l => l.acao.toUpperCase().includes(fAcao));
+      if (fText) list = list.filter(l => (l.usuario_nome||'').toLowerCase().includes(fText));
+
+      const tbody = document.getElementById('tbody-logs');
+      if (!list.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Nenhum registro encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(l => {
+        const dt  = new Date(l.created_at).toLocaleString('pt-BR');
+        const acao = l.acao.toUpperCase();
+        let badgeClass = 'badge-visualizador';
+        if (acao.includes('CRIOU'))   badgeClass = 'badge-criou';
+        if (acao.includes('REMOVEU')) badgeClass = 'badge-removeu';
+        if (acao.includes('EDITOU'))  badgeClass = 'badge-editou';
+        if (acao.includes('ALTEROU')) badgeClass = 'badge-alterou';
+        return `<tr>
+          <td style="white-space:nowrap;color:var(--muted);font-size:12px">${dt}</td>
+          <td><strong>${l.usuario_nome || '—'}</strong></td>
+          <td><span class="log-acao ${badgeClass}">${l.acao}</span></td>
+          <td style="font-size:12px;color:var(--muted)">${l.detalhe || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
 
     // ── Tabs ────────────────────────────────────────────────
     function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach((t, i) => {
-        const names = ['usuarios','locais'];
-        t.classList.toggle('active', names[i] === tab);
-      });
+      const names = ['usuarios','locais','logs'];
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', names[i] === tab));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
+      if (tab === 'logs') carregarLogs();
     }
 
     // ── Usuários ────────────────────────────────────────────
@@ -273,46 +392,49 @@
       document.getElementById('u-email').value  = email || '';
       document.getElementById('u-senha').value  = '';
       document.getElementById('u-perfil').value = perfil || 'visualizador';
-      document.getElementById('u-senha-group').style.display  = isNovo ? 'flex' : 'none';
-      document.getElementById('u-ativo-group').style.display  = isNovo ? 'none' : 'flex';
+      document.getElementById('u-senha-group').style.display = isNovo ? 'flex' : 'none';
+      document.getElementById('u-ativo-group').style.display = isNovo ? 'none' : 'flex';
       if (!isNovo) document.getElementById('u-ativo').value = String(ativo);
       document.getElementById('modal-usuario').classList.add('open');
     }
 
     async function salvarUsuario() {
-      const nome  = document.getElementById('u-nome').value.trim();
-      const email = document.getElementById('u-email').value.trim();
-      const senha = document.getElementById('u-senha').value;
-      const perfil= document.getElementById('u-perfil').value;
-      const ativo = document.getElementById('u-ativo').value === 'true';
+      const nome   = document.getElementById('u-nome').value.trim();
+      const email  = document.getElementById('u-email').value.trim();
+      const senha  = document.getElementById('u-senha').value;
+      const perfil = document.getElementById('u-perfil').value;
+      const ativo  = document.getElementById('u-ativo').value === 'true';
 
       if (!nome || !email) { showToast('Preencha nome e e-mail.', 'error'); return; }
 
+      const dbUser = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
+
       if (!editandoUsuarioId) {
-        // Novo usuário via Admin API (Edge Function)
         if (!senha || senha.length < 6) { showToast('Senha deve ter ao menos 6 caracteres.', 'error'); return; }
-       const { data, error } = await dbUser.auth.signUp({
-  email, password: senha,
-  options: { data: { nome, perfil } }
-});
-if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); return; }
+        const { error } = await dbUser.auth.signUp({
+          email, password: senha,
+          options: { data: { nome, perfil } }
+        });
+        if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); return; }
+        await registrarLog('CRIOU USUÁRIO', `${nome} (${email}) — perfil: ${perfil}`);
       } else {
-        // Editar perfil existente
-        const { error } = await db.from('profiles')
-          .update({ nome, perfil, ativo })
-          .eq('id', editandoUsuarioId);
+        const { error } = await db.from('profiles').update({ nome, perfil, ativo }).eq('id', editandoUsuarioId);
         if (error) { showToast('Erro ao atualizar usuário.', 'error'); return; }
+        await registrarLog('EDITOU USUÁRIO', `${nome} (${email}) — perfil: ${perfil}, ativo: ${ativo}`);
       }
 
       fecharModal('modal-usuario');
       await carregarUsuarios();
-      showToast(editandoUsuarioId ? 'Usuário atualizado!' : 'Usuário criado! Um e-mail de confirmação foi enviado.', 'success', 5000);
+      showToast(editandoUsuarioId ? 'Usuário atualizado!' : 'Usuário criado!', 'success');
     }
 
     async function excluirUsuario(id, nome) {
       if (!confirm(`Excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return;
       const { error } = await db.from('profiles').delete().eq('id', id);
       if (error) { showToast('Erro ao excluir usuário.', 'error'); return; }
+      await registrarLog('REMOVEU USUÁRIO', `${nome}`);
       await carregarUsuarios();
       showToast('Usuário excluído.', 'success');
     }
@@ -359,9 +481,11 @@ if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); ret
       if (!editandoLocalId) {
         const { error } = await db.from('locais').insert([{ nome, tipo }]);
         if (error) { showToast('Erro ao criar local.', 'error'); return; }
+        await registrarLog('CRIOU LOCAL', `${nome} (${tipo})`);
       } else {
         const { error } = await db.from('locais').update({ nome, tipo, ativo }).eq('id', editandoLocalId);
         if (error) { showToast('Erro ao atualizar local.', 'error'); return; }
+        await registrarLog('EDITOU LOCAL', `${nome} (${tipo}) — ativo: ${ativo}`);
       }
 
       fecharModal('modal-local');
@@ -370,22 +494,52 @@ if (error) { showToast('Erro ao criar usuário: ' + error.message, 'error'); ret
     }
 
     async function excluirLocal(id, nome) {
-      if (!confirm(`Excluir o local "${nome}"? As reservas existentes não serão afetadas.`)) return;
+      if (!confirm(`Excluir o local "${nome}"?`)) return;
       const { error } = await db.from('locais').delete().eq('id', id);
       if (error) { showToast('Erro ao excluir local.', 'error'); return; }
+      await registrarLog('REMOVEU LOCAL', nome);
       await carregarLocais();
       showToast('Local excluído.', 'success');
+    }
+
+    // ── Alterar Senha ────────────────────────────────────────
+    function abrirAlterarSenha() {
+      document.getElementById('nova-senha').value      = '';
+      document.getElementById('confirmar-senha').value = '';
+      document.getElementById('senha-erro').classList.remove('show');
+      document.getElementById('modal-senha').classList.add('open');
+    }
+
+    async function salvarSenha() {
+      const nova      = document.getElementById('nova-senha').value;
+      const confirmar = document.getElementById('confirmar-senha').value;
+      const erro      = document.getElementById('senha-erro');
+      erro.classList.remove('show');
+
+      if (!nova || nova.length < 6) {
+        erro.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+        erro.classList.add('show'); return;
+      }
+      if (nova !== confirmar) {
+        erro.textContent = 'As senhas não coincidem.';
+        erro.classList.add('show'); return;
+      }
+
+      const { error } = await db.auth.updateUser({ password: nova });
+      if (error) {
+        erro.textContent = 'Erro ao alterar senha. Tente novamente.';
+        erro.classList.add('show'); return;
+      }
+
+      await registrarLog('ALTEROU SENHA', 'Administrador alterou a própria senha', 'auth');
+      fecharModal('modal-senha');
+      showToast('Senha alterada com sucesso!', 'success');
     }
 
     // ── Utilitários ──────────────────────────────────────────
     function fecharModal(id) {
       document.getElementById(id).classList.remove('open');
     }
-
-    // Fecha modal clicando fora
-    document.querySelectorAll('.modal-overlay').forEach(o => {
-      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
-    });
 
     let _tt = null;
     function showToast(msg, type = 'success', duration = 3500) {
