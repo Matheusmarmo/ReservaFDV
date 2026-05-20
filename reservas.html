@@ -23,15 +23,15 @@
       font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
       color: rgba(255,255,255,0.9); letter-spacing: 0.04em; text-transform: uppercase;
     }
-    .header-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
     .header-user { font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'Open Sans', sans-serif; }
-    .btn-logout {
+    .btn-header {
       background: transparent; border: 1px solid rgba(255,255,255,0.25);
       color: rgba(255,255,255,0.7); border-radius: 5px; padding: 5px 12px;
       font-size: 11px; font-family: 'Montserrat', sans-serif; font-weight: 600;
       cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
     }
-    .btn-logout:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+    .btn-header:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
     .nav-strip {
       background: var(--navy2); border-bottom: 3px solid var(--blue);
       padding: 0 40px; display: flex; align-items: center; height: 42px; gap: 4px;
@@ -182,7 +182,7 @@
       letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); min-width: 110px;
     }
     .detail-val { font-size: 13px; color: var(--text); line-height: 1.5; }
-    .modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; }
+    .modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px; }
     .btn-fechar {
       background: var(--off); color: var(--muted); border: 1px solid var(--border);
       font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700;
@@ -190,6 +190,13 @@
       padding: 9px 20px; cursor: pointer; transition: background 0.2s;
     }
     .btn-fechar:hover { background: var(--border); }
+    .btn-save {
+      background: var(--blue); color: #fff; border: none;
+      font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase; border-radius: 5px;
+      padding: 9px 20px; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-save:hover { background: #1560aa; }
     .toast {
       position: fixed; bottom: 28px; right: 28px; background: var(--navy);
       color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px;
@@ -208,6 +215,11 @@
     .perfil-admin       { background: #fff3e0; color: #e65100; }
     .perfil-gerenciador { background: #e8f0fc; color: #1a4fc4; }
     .perfil-visualizador{ background: #f0f0f0; color: #666; }
+    .error-msg {
+      background: #fdf0f0; border: 1px solid #f5c0c0; border-radius: 6px;
+      color: var(--danger); font-size: 12px; padding: 10px 12px; margin-top: 8px; display: none;
+    }
+    .error-msg.show { display: block; }
   </style>
 </head>
 
@@ -217,7 +229,8 @@
     <span class="header-title">FDV — Reservas de Espaços</span>
     <div class="header-right">
       <span class="header-user" id="header-user"></span>
-      <button class="btn-logout" onclick="logout()">Sair</button>
+      <button class="btn-header" onclick="abrirAlterarSenha()">🔑 Alterar Senha</button>
+      <button class="btn-header" onclick="logout()">Sair</button>
     </div>
   </header>
   <div class="nav-strip">
@@ -322,12 +335,33 @@
     </main>
   </div>
 
+  <!-- Modal Detalhes -->
   <div class="modal-overlay" id="modal-detalhes">
     <div class="modal">
       <div class="modal-title">Detalhes da Reserva</div>
       <div id="modal-detalhes-body"></div>
       <div class="modal-footer">
-        <button class="btn-fechar" onclick="fecharDetalhes()">Fechar</button>
+        <button class="btn-fechar" onclick="fecharModal('modal-detalhes')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alterar Senha -->
+  <div class="modal-overlay" id="modal-senha">
+    <div class="modal">
+      <div class="modal-title">Alterar Senha</div>
+      <div class="form-group">
+        <label>Nova Senha</label>
+        <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label>Confirmar Nova Senha</label>
+        <input type="password" id="confirmar-senha" placeholder="Repita a nova senha">
+      </div>
+      <div class="error-msg" id="senha-erro"></div>
+      <div class="modal-footer">
+        <button class="btn-fechar" onclick="fecharModal('modal-senha')">Cancelar</button>
+        <button class="btn-save" onclick="salvarSenha()">Salvar</button>
       </div>
     </div>
   </div>
@@ -365,11 +399,25 @@
       await loadLocais();
       await fetchReservations();
 
-      document.getElementById('modal-detalhes').addEventListener('click', function(e) {
-        if (e.target === this) fecharDetalhes();
+      document.querySelectorAll('.modal-overlay').forEach(o => {
+        o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
       });
     });
 
+    // ── Log de atividade ─────────────────────────────────────
+    async function registrarLog(acao, detalhe, tabela = 'reservas') {
+      try {
+        await db.from('logs').insert([{
+          usuario_id:   perfilAtual?.id,
+          usuario_nome: perfilAtual?.nome,
+          acao,
+          detalhe,
+          tabela
+        }]);
+      } catch (e) { console.warn('Log falhou:', e); }
+    }
+
+    // ── Locais ───────────────────────────────────────────────
     async function loadLocais() {
       const { data, error } = await db.from('locais').select('*').eq('ativo', true).order('tipo').order('nome');
       if (error || !data) return;
@@ -397,6 +445,7 @@
       }
     }
 
+    // ── Reservas ─────────────────────────────────────────────
     async function fetchReservations() {
       const { data, error } = await db.from(TABELA).select('*').order('data').order('horario_inicio');
       if (error) { showToast('Erro ao carregar reservas.', 'error'); return; }
@@ -452,13 +501,11 @@
         showToast('Informe o responsável ou o evento.', 'error'); return;
       }
 
-      // Verifica conflito por horário (comparação de strings HH:MM)
       const conflict = reservations.find(r => {
         if (r.sala !== sala || r.data !== data) return false;
-        const rHi = r.horario_inicio;
         const rHf = r.horario_fim || r.horario_inicio;
         const nHf = hf || hi;
-        return hi < rHf && nHf > rHi;
+        return hi < rHf && nHf > r.horario_inicio;
       });
 
       if (conflict) {
@@ -475,10 +522,11 @@
         const salvo = await saveToSupabase(novaReserva);
         reservations.push(salvo);
         renderList();
+        await registrarLog('CRIOU RESERVA', `${sala} em ${data} às ${horario} — ${ev || fav}`);
         showToast('Reserva adicionada com sucesso!', 'success');
         ['evento','favorecido','motivo','observacoes'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('horario_inicio').value = '';
-        document.getElementById('horario_fim').value = '';
+        document.getElementById('horario_fim').value    = '';
         clearFieldErrors();
       } catch (err) {
         showToast('Erro ao salvar reserva.', 'error');
@@ -488,16 +536,19 @@
     async function deleteReservation(id) {
       if (perfilAtual?.perfil === 'visualizador') return;
       if (!confirm('Tem certeza que deseja remover esta reserva?')) return;
+      const r = reservations.find(r => String(r.id) === String(id));
       try {
         await deleteFromSupabase(id);
         reservations = reservations.filter(r => String(r.id) !== String(id));
         renderList();
+        if (r) await registrarLog('REMOVEU RESERVA', `${r.sala} em ${r.data} às ${r.horario} — ${r.evento || r.favorecido}`);
         showToast('Reserva removida com sucesso.', 'success');
       } catch (err) {
         showToast('Erro ao remover reserva.', 'error');
       }
     }
 
+    // ── Detalhes ─────────────────────────────────────────────
     function abrirDetalhes(id) {
       const r = reservations.find(r => String(r.id) === String(id));
       if (!r) return;
@@ -525,8 +576,44 @@
       document.getElementById('modal-detalhes').classList.add('open');
     }
 
-    function fecharDetalhes() {
-      document.getElementById('modal-detalhes').classList.remove('open');
+    // ── Alterar Senha ────────────────────────────────────────
+    function abrirAlterarSenha() {
+      document.getElementById('nova-senha').value     = '';
+      document.getElementById('confirmar-senha').value = '';
+      document.getElementById('senha-erro').classList.remove('show');
+      document.getElementById('modal-senha').classList.add('open');
+    }
+
+    async function salvarSenha() {
+      const nova      = document.getElementById('nova-senha').value;
+      const confirmar = document.getElementById('confirmar-senha').value;
+      const erro      = document.getElementById('senha-erro');
+
+      erro.classList.remove('show');
+
+      if (!nova || nova.length < 6) {
+        erro.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+        erro.classList.add('show'); return;
+      }
+      if (nova !== confirmar) {
+        erro.textContent = 'As senhas não coincidem.';
+        erro.classList.add('show'); return;
+      }
+
+      const { error } = await db.auth.updateUser({ password: nova });
+      if (error) {
+        erro.textContent = 'Erro ao alterar senha. Tente novamente.';
+        erro.classList.add('show'); return;
+      }
+
+      await registrarLog('ALTEROU SENHA', 'Usuário alterou a própria senha', 'auth');
+      fecharModal('modal-senha');
+      showToast('Senha alterada com sucesso!', 'success');
+    }
+
+    // ── Utilitários ──────────────────────────────────────────
+    function fecharModal(id) {
+      document.getElementById(id).classList.remove('open');
     }
 
     function renderList() {
@@ -560,13 +647,8 @@
           <table class="res-table">
             <thead>
               <tr>
-                <th>Data</th>
-                <th>Horário</th>
-                <th>Espaço</th>
-                <th>Tipo</th>
-                <th>Evento / Curso</th>
-                <th>Responsável</th>
-                <th></th>
+                <th>Data</th><th>Horário</th><th>Espaço</th><th>Tipo</th>
+                <th>Evento / Curso</th><th>Responsável</th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -581,12 +663,10 @@
                   <td><span class="type-badge type-${r.tipo}">${typeLbl}</span></td>
                   <td>${r.evento || '—'}</td>
                   <td style="color:var(--muted)">${r.favorecido || '—'}</td>
-                  <td>
-                    <div class="card-actions">
-                      <button class="btn-details" onclick="abrirDetalhes(${r.id})">Detalhes</button>
-                      ${podeExcluir ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
-                    </div>
-                  </td>
+                  <td><div class="card-actions">
+                    <button class="btn-details" onclick="abrirDetalhes(${r.id})">Detalhes</button>
+                    ${podeExcluir ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
+                  </div></td>
                 </tr>`;
               }).join('')}
             </tbody>
