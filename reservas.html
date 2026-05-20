@@ -26,18 +26,13 @@
       font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
       color: rgba(255,255,255,0.9); letter-spacing: 0.04em; text-transform: uppercase;
     }
-    .header-right {
-      margin-left: auto; display: flex; align-items: center; gap: 16px;
-    }
-    .header-user {
-      font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'Open Sans', sans-serif;
-    }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+    .header-user { font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'Open Sans', sans-serif; }
     .btn-logout {
       background: transparent; border: 1px solid rgba(255,255,255,0.25);
       color: rgba(255,255,255,0.7); border-radius: 5px; padding: 5px 12px;
       font-size: 11px; font-family: 'Montserrat', sans-serif; font-weight: 600;
-      cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase;
-      transition: all 0.2s;
+      cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
     }
     .btn-logout:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
     .nav-strip {
@@ -118,38 +113,48 @@
       padding: 14px 18px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
     }
     .filters .form-group { flex: 1; min-width: 140px; }
-    .reservations-list { display: flex; flex-direction: column; gap: 10px; }
-    .reservation-card {
+
+    /* ── Tabela de reservas ── */
+    .reservations-wrap {
       background: var(--white); border: 1px solid var(--border); border-radius: 8px;
-      padding: 14px 18px; display: flex; align-items: center; gap: 16px;
-      transition: box-shadow 0.2s;
+      overflow: hidden;
     }
-    .reservation-card:hover { box-shadow: 0 2px 12px rgba(14,26,56,0.08); }
-    .card-date {
-      background: var(--navy); color: #fff; border-radius: 8px;
-      width: 48px; height: 52px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; flex-shrink: 0;
+    .res-table { width: 100%; border-collapse: collapse; }
+    .res-table th {
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+      padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border);
+      background: var(--off); white-space: nowrap;
     }
-    .card-date .day { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; line-height: 1; }
-    .card-date .month { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; opacity: 0.7; margin-top: 2px; }
-    .card-info { flex: 1; min-width: 0; }
-    .room { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; }
-    .type-sala { background: #e8f0fc; color: #1a4fc4; }
-    .type-auditorio { background: #f0e8fc; color: #7a1ac4; }
-    .type-lab { background: #e8fcf0; color: #1a9e5c; }
-    .event { font-size: 12px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .time-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--sky-lt); color: var(--blue); border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600; margin-top: 6px; }
-    .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .res-table td {
+      padding: 11px 14px; font-size: 13px;
+      border-bottom: 1px solid var(--border); vertical-align: middle;
+    }
+    .res-table tr:last-child td { border-bottom: none; }
+    .res-table tr:hover td { background: var(--sky-lt); }
+    .type-badge {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 2px 7px; border-radius: 20px;
+    }
+    .type-sala     { background: #e8f0fc; color: #1a4fc4; }
+    .type-auditorio{ background: #f0e8fc; color: #7a1ac4; }
+    .type-lab      { background: #e8fcf0; color: #1a9e5c; }
+    .time-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--sky-lt); color: var(--blue);
+      border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600;
+    }
     .btn-del {
       background: #fdf0f0; border: 1px solid #f5c0c0; color: var(--danger);
-      border-radius: 5px; padding: 6px 12px; font-size: 11px; font-family: 'Montserrat', sans-serif;
-      font-weight: 700; cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+      border-radius: 5px; padding: 5px 10px; font-size: 11px;
+      font-family: 'Montserrat', sans-serif; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
     }
     .btn-del:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 13px; line-height: 1.6; }
+
     .toast {
       position: fixed; bottom: 28px; right: 28px; background: var(--navy);
       color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px;
@@ -159,15 +164,15 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .toast.success .toast-icon { color: var(--success); }
-    .toast.error .toast-icon { color: var(--danger); }
+    .toast.error   .toast-icon { color: var(--danger); }
     .toast-icon { font-size: 16px; font-weight: 800; }
     .perfil-badge {
       font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
       padding: 3px 8px; border-radius: 20px; font-family: 'Montserrat', sans-serif;
     }
-    .perfil-admin { background: #fff3e0; color: #e65100; }
+    .perfil-admin       { background: #fff3e0; color: #e65100; }
     .perfil-gerenciador { background: #e8f0fc; color: #1a4fc4; }
-    .perfil-visualizador { background: #f0f0f0; color: #666; }
+    .perfil-visualizador{ background: #f0f0f0; color: #666; }
   </style>
 </head>
 
@@ -186,10 +191,8 @@
   </div>
 
   <div class="main-layout">
-    <!-- SIDEBAR: formulário de nova reserva (oculto para visualizador) -->
     <aside class="sidebar" id="sidebar-form">
       <div class="sidebar-heading">Nova Reserva</div>
-
       <div>
         <div class="section-label">Espaço</div>
         <div class="form-group">
@@ -205,7 +208,6 @@
           <select id="sala"></select>
         </div>
       </div>
-
       <div>
         <div class="section-label">Data e Horário</div>
         <div class="form-group">
@@ -223,7 +225,6 @@
           </div>
         </div>
       </div>
-
       <div>
         <div class="section-label">Informações</div>
         <div class="form-group">
@@ -243,11 +244,9 @@
           <textarea id="observacoes" placeholder="Informações adicionais..."></textarea>
         </div>
       </div>
-
       <button class="btn-primary" onclick="addReservation()">Confirmar Reserva</button>
     </aside>
 
-    <!-- Sidebar substituta para visualizador -->
     <aside class="sidebar" id="sidebar-viewer" style="display:none">
       <div class="sidebar-heading">Consulta</div>
       <p style="font-size:13px; color:var(--muted); line-height:1.6;">
@@ -284,7 +283,7 @@
         </div>
       </div>
 
-      <div class="reservations-list" id="reservations-list">
+      <div id="reservations-list">
         <div class="empty-state"><div class="icon">📋</div><p>Carregando reservas...</p></div>
       </div>
     </main>
@@ -300,8 +299,8 @@
   <script>
     const TABELA = 'reservas';
     let reservations = [];
-    let perfilAtual = null;
-    let locaisMap = {};
+    let perfilAtual  = null;
+    let locaisMap    = {};
 
     const HORARIOS = [
       '7:30 - 8:20','8:20 - 9:10','9:10 - 9:30','9:30 - 10:20',
@@ -310,36 +309,23 @@
       '20:40 - 21:00','21:00 - 21:50','21:50 - 22:40'
     ];
 
-    // ── Init ─────────────────────────────────────────────────
     window.addEventListener('load', async () => {
-      const style = document.createElement('style');
-      style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-      document.head.appendChild(style);
-
-      // Verifica sessão e perfil
       perfilAtual = await protegerPagina(['admin', 'gerenciador', 'visualizador']);
       if (!perfilAtual) return;
 
-      // Exibe nome e perfil no header
       document.getElementById('header-user').innerHTML =
         `${perfilAtual.nome} <span class="perfil-badge perfil-${perfilAtual.perfil}">${perfilAtual.perfil}</span>`;
 
-      // Mostra link admin se for admin
-      if (perfilAtual.perfil === 'admin') {
+      if (perfilAtual.perfil === 'admin')
         document.getElementById('nav-admin').style.display = 'flex';
-      }
 
-      // Controle de visibilidade por perfil
       if (perfilAtual.perfil === 'visualizador') {
         document.getElementById('sidebar-form').style.display = 'none';
         document.getElementById('sidebar-viewer').style.display = 'flex';
       }
 
-      // Data de hoje
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('data').value = today;
+      document.getElementById('data').value = new Date().toISOString().split('T')[0];
 
-      // Popula selects de horário
       const hiSel = document.getElementById('horario_inicio');
       const hfSel = document.getElementById('horario_fim');
       HORARIOS.forEach(h => {
@@ -348,17 +334,13 @@
       });
       hfSel.innerHTML = '<option value="">Sem fim definido</option>' + hfSel.innerHTML;
 
-      // Carrega locais do Supabase
       await loadLocais();
-
-      // Carrega reservas
       await fetchReservations();
     });
 
     async function loadLocais() {
       const { data, error } = await db.from('locais').select('*').eq('ativo', true).order('tipo').order('nome');
       if (error || !data) return;
-
       locaisMap = {};
       data.forEach(l => {
         if (!locaisMap[l.tipo]) locaisMap[l.tipo] = [];
@@ -369,26 +351,17 @@
 
     function updateRoomOptions() {
       const tipo = document.getElementById('tipo').value;
-      const sel = document.getElementById('sala');
-      const opcoes = locaisMap[tipo] || [];
-      sel.innerHTML = opcoes.map(s => `<option value="${s}">${s}</option>`).join('');
-
+      const sel  = document.getElementById('sala');
+      sel.innerHTML = (locaisMap[tipo] || []).map(s => `<option value="${s}">${s}</option>`).join('');
       const motiGroup = document.getElementById('motivo-group');
-      const labEl = document.getElementById('label-evento');
-      const favEl = document.getElementById('label-favorecido');
-
+      const labEl     = document.getElementById('label-evento');
+      const favEl     = document.getElementById('label-favorecido');
       if (tipo === 'lab') {
-        motiGroup.style.display = 'block';
-        labEl.textContent = 'Curso';
-        favEl.textContent = 'Responsável';
+        motiGroup.style.display = 'block'; labEl.textContent = 'Curso'; favEl.textContent = 'Responsável';
       } else if (tipo === 'auditorio') {
-        motiGroup.style.display = 'none';
-        labEl.textContent = 'Descrição do Evento';
-        favEl.textContent = 'Favorecido';
+        motiGroup.style.display = 'none'; labEl.textContent = 'Descrição do Evento'; favEl.textContent = 'Favorecido';
       } else {
-        motiGroup.style.display = 'none';
-        labEl.textContent = 'Curso / Evento';
-        favEl.textContent = 'Responsável / Solicitante';
+        motiGroup.style.display = 'none'; labEl.textContent = 'Curso / Evento'; favEl.textContent = 'Responsável / Solicitante';
       }
     }
 
@@ -417,8 +390,7 @@
 
     function getSlots(hi, hf) {
       if (!hf) return [hi];
-      const iStart = HORARIOS.indexOf(hi);
-      const iEnd = HORARIOS.indexOf(hf);
+      const iStart = HORARIOS.indexOf(hi), iEnd = HORARIOS.indexOf(hf);
       if (iStart === -1 || iEnd === -1 || iEnd < iStart) return [hi];
       return HORARIOS.slice(iStart, iEnd + 1);
     }
@@ -427,7 +399,7 @@
       const el = document.getElementById(id);
       if (!el) return;
       el.style.borderColor = hasError ? 'var(--danger)' : '';
-      el.style.boxShadow = hasError ? '0 0 0 3px rgba(217,58,58,0.15)' : '';
+      el.style.boxShadow   = hasError ? '0 0 0 3px rgba(217,58,58,0.15)' : '';
     }
 
     function clearFieldErrors() {
@@ -437,16 +409,15 @@
     async function addReservation() {
       if (perfilAtual?.perfil === 'visualizador') return;
       clearFieldErrors();
-
-      const data   = document.getElementById('data').value;
-      const sala   = document.getElementById('sala').value;
-      const tipo   = document.getElementById('tipo').value;
-      const hi     = document.getElementById('horario_inicio').value;
-      const hf     = document.getElementById('horario_fim').value;
-      const fav    = document.getElementById('favorecido').value.trim();
-      const ev     = document.getElementById('evento').value.trim();
-      const mot    = document.getElementById('motivo').value.trim();
-      const obs    = document.getElementById('observacoes').value.trim();
+      const data = document.getElementById('data').value;
+      const sala = document.getElementById('sala').value;
+      const tipo = document.getElementById('tipo').value;
+      const hi   = document.getElementById('horario_inicio').value;
+      const hf   = document.getElementById('horario_fim').value;
+      const fav  = document.getElementById('favorecido').value.trim();
+      const ev   = document.getElementById('evento').value.trim();
+      const mot  = document.getElementById('motivo').value.trim();
+      const obs  = document.getElementById('observacoes').value.trim();
 
       if (!data) { setFieldError('data', true); showToast('Selecione uma data.', 'error'); return; }
       if (!ev && !fav) { setFieldError('favorecido', true); setFieldError('evento', true); showToast('Informe o responsável ou o evento.', 'error'); return; }
@@ -464,7 +435,7 @@
         return;
       }
 
-      const horario = hf ? `${hi} até ${hf}` : hi;
+      const horario     = hf ? `${hi} até ${hf}` : hi;
       const novaReserva = { tipo, sala, data, horario_inicio: hi, horario_fim: hf, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
 
       try {
@@ -508,7 +479,8 @@
       list.sort((a, b) => a.data.localeCompare(b.data) || a.horario_inicio.localeCompare(b.horario_inicio));
 
       const container = document.getElementById('reservations-list');
-      document.getElementById('count-label').textContent = `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
+      document.getElementById('count-label').textContent =
+        `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
 
       const podeExcluir = perfilAtual?.perfil === 'admin';
 
@@ -517,26 +489,38 @@
         return;
       }
 
-      const months = ['','JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
-      container.innerHTML = list.map(r => {
-        const [,, day] = r.data.split('-');
-        const mon = months[parseInt(r.data.split('-')[1])];
-        const typeLbl = r.tipo === 'sala' ? 'Sala' : r.tipo === 'auditorio' ? 'Auditório' : 'Lab';
-        const desc = r.evento || r.favorecido || '—';
-        const sub = [r.favorecido, r.observacoes].filter(Boolean).join(' · ');
-        return `<div class="reservation-card">
-          <div class="card-date"><div class="day">${day}</div><div class="month">${mon}</div></div>
-          <div class="card-info">
-            <div class="room">${r.sala} <span class="type-badge type-${r.tipo}">${typeLbl}</span></div>
-            <div class="event">${desc}</div>
-            ${sub ? `<div class="event" style="margin-top:2px;font-size:11px">${sub}</div>` : ''}
-            <span class="time-badge">⏱ ${r.horario}</span>
-          </div>
-          <div class="card-actions">
-            ${podeExcluir ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
-          </div>
+      container.innerHTML = `
+        <div class="reservations-wrap">
+          <table class="res-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Espaço</th>
+                <th>Tipo</th>
+                <th>Evento / Curso</th>
+                <th>Responsável</th>
+                ${podeExcluir ? '<th></th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(r => {
+                const [ano, mes, dia] = r.data.split('-');
+                const dataFmt = `${dia}/${mes}/${ano}`;
+                const typeLbl = r.tipo === 'sala' ? 'Sala' : r.tipo === 'auditorio' ? 'Auditório' : 'Lab';
+                return `<tr>
+                  <td style="white-space:nowrap;font-weight:600">${dataFmt}</td>
+                  <td><span class="time-badge">⏱ ${r.horario}</span></td>
+                  <td style="font-weight:600">${r.sala}</td>
+                  <td><span class="type-badge type-${r.tipo}">${typeLbl}</span></td>
+                  <td>${r.evento || '—'}</td>
+                  <td style="color:var(--muted)">${r.favorecido || '—'}</td>
+                  ${podeExcluir ? `<td><button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button></td>` : ''}
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
         </div>`;
-      }).join('');
     }
 
     let _toastTimer = null;
@@ -545,7 +529,7 @@
       if (_toastTimer) clearTimeout(_toastTimer);
       t.className = `toast show ${type}`;
       document.getElementById('toast-icon').textContent = type === 'success' ? '✓' : '✕';
-      document.getElementById('toast-msg').textContent = msg;
+      document.getElementById('toast-msg').textContent  = msg;
       _toastTimer = setTimeout(() => { t.className = 'toast'; }, duration);
     }
   </script>
