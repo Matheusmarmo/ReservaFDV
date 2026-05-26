@@ -80,6 +80,7 @@
     }
     textarea { resize: vertical; min-height: 72px; }
     .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .btn-primary {
       background: var(--blue); color: #fff; border: none; border-radius: 6px;
       font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700;
@@ -180,9 +181,11 @@
       content: ''; display: inline-block; width: 4px; height: 18px;
       background: var(--sky); border-radius: 2px;
     }
-    .modal-section { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+    .modal-section {
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue);
-      margin: 16px 0 10px; }
+      margin: 16px 0 10px;
+    }
     .detail-row {
       display: flex; gap: 12px; padding: 10px 0;
       border-bottom: 1px solid var(--border); align-items: baseline;
@@ -231,6 +234,10 @@
       color: var(--danger); font-size: 12px; padding: 10px 12px; margin-top: 8px; display: none;
     }
     .error-msg.show { display: block; }
+    .info-note {
+      background: var(--sky-lt); border: 1px solid #b8d8f0; border-radius: 6px;
+      color: var(--blue); font-size: 11px; padding: 8px 12px; margin-top: 4px;
+    }
   </style>
 </head>
 
@@ -269,18 +276,27 @@
       </div>
       <div>
         <div class="section-label">Data e Horário</div>
-        <div class="form-group">
-          <label for="data">Data</label>
-          <input type="date" id="data">
+        <div class="date-grid">
+          <div class="form-group">
+            <label for="data">De (início)</label>
+            <input type="date" id="data" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="data_fim">Até (opcional)</label>
+            <input type="date" id="data_fim" autocomplete="off">
+          </div>
+        </div>
+        <div class="info-note" id="multi-day-note" style="display:none">
+          📅 Será criada uma reserva para cada dia do período selecionado.
         </div>
         <div class="time-grid">
           <div class="form-group">
             <label for="horario_inicio">Início</label>
-            <input type="time" id="horario_inicio">
+            <input type="time" id="horario_inicio" autocomplete="off">
           </div>
           <div class="form-group">
             <label for="horario_fim">Fim (opcional)</label>
-            <input type="time" id="horario_fim">
+            <input type="time" id="horario_fim" autocomplete="off">
           </div>
         </div>
       </div>
@@ -288,19 +304,19 @@
         <div class="section-label">Informações</div>
         <div class="form-group">
           <label id="label-favorecido">Responsável / Solicitante</label>
-          <input type="text" id="favorecido" placeholder="Nome do responsável">
+          <input type="text" id="favorecido" placeholder="Nome do responsável" autocomplete="off">
         </div>
         <div class="form-group" id="evento-group">
           <label id="label-evento">Curso / Evento</label>
-          <input type="text" id="evento" placeholder="Nome do evento ou curso">
+          <input type="text" id="evento" placeholder="Nome do evento ou curso" autocomplete="off">
         </div>
         <div class="form-group" id="motivo-group" style="display:none">
           <label>Motivo</label>
-          <input type="text" id="motivo" placeholder="Motivo de uso do lab">
+          <input type="text" id="motivo" placeholder="Motivo de uso do lab" autocomplete="off">
         </div>
         <div class="form-group">
           <label>Observações</label>
-          <textarea id="observacoes" placeholder="Informações adicionais..."></textarea>
+          <textarea id="observacoes" placeholder="Informações adicionais..." autocomplete="off"></textarea>
         </div>
       </div>
       <button class="btn-primary" onclick="addReservation()">Confirmar Reserva</button>
@@ -324,11 +340,12 @@
       <div class="filters">
         <div class="form-group">
           <label>Filtrar por Data</label>
-          <input type="date" id="filter-date" oninput="renderList()">
+          <!-- Mudança 1: autocomplete="off" nos filtros -->
+          <input type="date" id="filter-date" autocomplete="off" oninput="renderList()">
         </div>
         <div class="form-group">
           <label>Tipo de Espaço</label>
-          <select id="filter-tipo" onchange="renderList()">
+          <select id="filter-tipo" autocomplete="off" onchange="renderList()">
             <option value="">Todos</option>
             <option value="sala">Sala</option>
             <option value="auditorio">Auditório</option>
@@ -337,7 +354,9 @@
         </div>
         <div class="form-group">
           <label>Buscar</label>
-          <input type="text" id="filter-text" placeholder="Evento, sala, responsável..." oninput="renderList()">
+          <input type="text" id="filter-text" placeholder="Evento, sala, responsável..."
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            oninput="renderList()">
         </div>
       </div>
       <div id="reservations-list">
@@ -361,7 +380,6 @@
   <div class="modal-overlay" id="modal-editar">
     <div class="modal">
       <div class="modal-title">Editar Reserva</div>
-
       <div class="modal-section">Espaço</div>
       <div class="form-group">
         <label>Tipo</label>
@@ -375,41 +393,38 @@
         <label>Sala / Espaço</label>
         <select id="e-sala"></select>
       </div>
-
       <div class="modal-section">Data e Horário</div>
       <div class="form-group">
         <label>Data</label>
-        <input type="date" id="e-data">
+        <input type="date" id="e-data" autocomplete="off">
       </div>
       <div class="time-grid">
         <div class="form-group">
           <label>Início</label>
-          <input type="time" id="e-horario-inicio">
+          <input type="time" id="e-horario-inicio" autocomplete="off">
         </div>
         <div class="form-group">
           <label>Fim (opcional)</label>
-          <input type="time" id="e-horario-fim">
+          <input type="time" id="e-horario-fim" autocomplete="off">
         </div>
       </div>
-
       <div class="modal-section">Informações</div>
       <div class="form-group">
         <label>Responsável / Solicitante</label>
-        <input type="text" id="e-favorecido" placeholder="Nome do responsável">
+        <input type="text" id="e-favorecido" placeholder="Nome do responsável" autocomplete="off">
       </div>
       <div class="form-group">
         <label>Curso / Evento</label>
-        <input type="text" id="e-evento" placeholder="Nome do evento ou curso">
+        <input type="text" id="e-evento" placeholder="Nome do evento ou curso" autocomplete="off">
       </div>
       <div class="form-group">
         <label>Motivo</label>
-        <input type="text" id="e-motivo" placeholder="Motivo de uso">
+        <input type="text" id="e-motivo" placeholder="Motivo de uso" autocomplete="off">
       </div>
       <div class="form-group">
         <label>Observações</label>
-        <textarea id="e-observacoes" placeholder="Informações adicionais..."></textarea>
+        <textarea id="e-observacoes" placeholder="Informações adicionais..." autocomplete="off"></textarea>
       </div>
-
       <div class="modal-footer">
         <button class="btn-fechar" onclick="fecharModal('modal-editar')">Cancelar</button>
         <button class="btn-save" onclick="salvarEdicao()">Salvar Alterações</button>
@@ -423,11 +438,11 @@
       <div class="modal-title">Alterar Senha</div>
       <div class="form-group">
         <label>Nova Senha</label>
-        <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres">
+        <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
       </div>
       <div class="form-group" style="margin-top:12px">
         <label>Confirmar Nova Senha</label>
-        <input type="password" id="confirmar-senha" placeholder="Repita a nova senha">
+        <input type="password" id="confirmar-senha" placeholder="Repita a nova senha" autocomplete="new-password">
       </div>
       <div class="error-msg" id="senha-erro"></div>
       <div class="modal-footer">
@@ -446,10 +461,10 @@
   <script src="js/auth.js"></script>
   <script>
     const TABELA = 'reservas';
-    let reservations  = [];
-    let perfilAtual   = null;
-    let locaisMap     = {};
-    let editandoId    = null;
+    let reservations = [];
+    let perfilAtual  = null;
+    let locaisMap    = {};
+    let editandoId   = null;
 
     window.addEventListener('load', async () => {
       perfilAtual = await protegerPagina(['admin', 'gerenciador', 'visualizador']);
@@ -468,6 +483,12 @@
 
       document.getElementById('data').value = new Date().toISOString().split('T')[0];
 
+      // Mostra aviso de múltiplos dias quando data_fim é preenchida
+      document.getElementById('data_fim').addEventListener('change', function() {
+        const note = document.getElementById('multi-day-note');
+        note.style.display = this.value ? 'block' : 'none';
+      });
+
       await loadLocais();
       await fetchReservations();
 
@@ -480,8 +501,7 @@
     async function registrarLog(acao, detalhe, tabela = 'reservas') {
       try {
         await db.from('logs').insert([{
-          usuario_id:   perfilAtual?.id,
-          usuario_nome: perfilAtual?.nome,
+          usuario_id: perfilAtual?.id, usuario_nome: perfilAtual?.nome,
           acao, detalhe, tabela
         }]);
       } catch(e) { console.warn('Log falhou:', e); }
@@ -547,6 +567,18 @@
       if (error) throw error;
     }
 
+    // ── Gera lista de datas entre duas datas ─────────────────
+    function gerarDatas(dataInicio, dataFim) {
+      const datas = [];
+      const atual = new Date(dataInicio + 'T12:00:00');
+      const fim   = new Date((dataFim || dataInicio) + 'T12:00:00');
+      while (atual <= fim) {
+        datas.push(atual.toISOString().split('T')[0]);
+        atual.setDate(atual.getDate() + 1);
+      }
+      return datas;
+    }
+
     function setFieldError(id, hasError) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -555,60 +587,91 @@
     }
 
     function clearFieldErrors() {
-      ['data','sala','tipo','horario_inicio','favorecido','evento'].forEach(id => setFieldError(id, false));
+      ['data','sala','tipo','horario_inicio','horario_fim','favorecido','evento'].forEach(id => setFieldError(id, false));
     }
 
     async function addReservation() {
       if (perfilAtual?.perfil === 'visualizador') return;
       clearFieldErrors();
 
-      const data = document.getElementById('data').value;
-      const sala = document.getElementById('sala').value;
-      const tipo = document.getElementById('tipo').value;
-      const hi   = document.getElementById('horario_inicio').value;
-      const hf   = document.getElementById('horario_fim').value;
-      const fav  = document.getElementById('favorecido').value.trim();
-      const ev   = document.getElementById('evento').value.trim();
-      const mot  = document.getElementById('motivo').value.trim();
-      const obs  = document.getElementById('observacoes').value.trim();
+      const dataInicio = document.getElementById('data').value;
+      const dataFim    = document.getElementById('data_fim').value;
+      const sala       = document.getElementById('sala').value;
+      const tipo       = document.getElementById('tipo').value;
+      const hi         = document.getElementById('horario_inicio').value;
+      const hf         = document.getElementById('horario_fim').value;
+      const fav        = document.getElementById('favorecido').value.trim();
+      const ev         = document.getElementById('evento').value.trim();
+      const mot        = document.getElementById('motivo').value.trim();
+      const obs        = document.getElementById('observacoes').value.trim();
 
-      if (!data) { setFieldError('data', true); showToast('Selecione uma data.', 'error'); return; }
-      if (!hi)   { setFieldError('horario_inicio', true); showToast('Informe o horário de início.', 'error'); return; }
+      // Validações
+      if (!dataInicio) { setFieldError('data', true); showToast('Selecione a data de início.', 'error'); return; }
+      if (!hi) { setFieldError('horario_inicio', true); showToast('Informe o horário de início.', 'error'); return; }
       if (!ev && !fav) {
         setFieldError('favorecido', true); setFieldError('evento', true);
         showToast('Informe o responsável ou o evento.', 'error'); return;
       }
 
-      const conflict = reservations.find(r => {
-        if (r.sala !== sala || r.data !== data) return false;
-        const rHf = r.horario_fim || r.horario_inicio;
-        const nHf = hf || hi;
-        return hi < rHf && nHf > r.horario_inicio;
-      });
-
-      if (conflict) {
-        setFieldError('horario_inicio', true); setFieldError('sala', true);
-        const d = new Date(data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
-        showToast(`Conflito! "${conflict.sala}" já reservada em ${d} às ${conflict.horario_inicio} para "${conflict.evento || conflict.favorecido}".`, 'error', 6000);
+      // Mudança 3: Valida se horário fim não é anterior ao início
+      if (hf && hf <= hi) {
+        setFieldError('horario_fim', true);
+        showToast('O horário de fim não pode ser igual ou anterior ao horário de início.', 'error', 5000);
         return;
       }
 
-      const horario     = hf ? `${hi} até ${hf}` : hi;
-      const novaReserva = { tipo, sala, data, horario_inicio: hi, horario_fim: hf || null, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
-
-      try {
-        const salvo = await saveToSupabase(novaReserva);
-        reservations.push(salvo);
-        renderList();
-        await registrarLog('CRIOU RESERVA', `${sala} em ${data} às ${horario} — ${ev || fav}`);
-        showToast('Reserva adicionada com sucesso!', 'success');
-        ['evento','favorecido','motivo','observacoes'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('horario_inicio').value = '';
-        document.getElementById('horario_fim').value    = '';
-        clearFieldErrors();
-      } catch (err) {
-        showToast('Erro ao salvar reserva.', 'error');
+      // Valida data fim não anterior à data início
+      if (dataFim && dataFim < dataInicio) {
+        setFieldError('data_fim', true);
+        showToast('A data final não pode ser anterior à data de início.', 'error');
+        return;
       }
+
+      const horario = hf ? `${hi} até ${hf}` : hi;
+      const datas   = gerarDatas(dataInicio, dataFim);
+
+      // Verifica conflitos em todos os dias
+      for (const data of datas) {
+        const conflict = reservations.find(r => {
+          if (r.sala !== sala || r.data !== data) return false;
+          const rHf = r.horario_fim || r.horario_inicio;
+          const nHf = hf || hi;
+          return hi < rHf && nHf > r.horario_inicio;
+        });
+        if (conflict) {
+          setFieldError('horario_inicio', true); setFieldError('sala', true);
+          const d = new Date(data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+          showToast(`Conflito em ${d}! "${conflict.sala}" já reservada às ${conflict.horario_inicio} para "${conflict.evento || conflict.favorecido}".`, 'error', 6000);
+          return;
+        }
+      }
+
+      // Salva uma reserva para cada dia
+      let salvas = 0;
+      for (const data of datas) {
+        try {
+          const salvo = await saveToSupabase({ tipo, sala, data, horario_inicio: hi, horario_fim: hf || null, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs });
+          reservations.push(salvo);
+          salvas++;
+        } catch (err) {
+          showToast(`Erro ao salvar reserva do dia ${data}.`, 'error');
+        }
+      }
+
+      renderList();
+
+      const msg = datas.length > 1
+        ? `${salvas} reservas criadas (${datas.length} dias)!`
+        : 'Reserva adicionada com sucesso!';
+      showToast(msg, 'success');
+      await registrarLog('CRIOU RESERVA', `${sala} de ${dataInicio}${dataFim && dataFim !== dataInicio ? ' até ' + dataFim : ''} às ${horario} — ${ev || fav}`);
+
+      ['evento','favorecido','motivo','observacoes'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('horario_inicio').value = '';
+      document.getElementById('horario_fim').value    = '';
+      document.getElementById('data_fim').value       = '';
+      document.getElementById('multi-day-note').style.display = 'none';
+      clearFieldErrors();
     }
 
     async function deleteReservation(id) {
@@ -626,12 +689,11 @@
       }
     }
 
-    // ── Editar Reserva ───────────────────────────────────────
+    // ── Editar ───────────────────────────────────────────────
     function abrirEditar(id) {
       const r = reservations.find(r => String(r.id) === String(id));
       if (!r) return;
       editandoId = id;
-
       document.getElementById('e-tipo').value           = r.tipo;
       updateEditRoomOptions();
       document.getElementById('e-sala').value           = r.sala;
@@ -642,7 +704,6 @@
       document.getElementById('e-evento').value         = r.evento         || '';
       document.getElementById('e-motivo').value         = r.motivo         || '';
       document.getElementById('e-observacoes').value    = r.observacoes    || '';
-
       document.getElementById('modal-editar').classList.add('open');
     }
 
@@ -661,17 +722,21 @@
       if (!hi)   { showToast('Informe o horário de início.', 'error'); return; }
       if (!ev && !fav) { showToast('Informe o responsável ou o evento.', 'error'); return; }
 
+      // Mudança 3 também na edição
+      if (hf && hf <= hi) {
+        showToast('O horário de fim não pode ser igual ou anterior ao horário de início.', 'error', 5000);
+        return;
+      }
+
       const horario = hf ? `${hi} até ${hf}` : hi;
 
       const { error } = await db.from(TABELA).update({
-        tipo, sala, data,
-        horario_inicio: hi, horario_fim: hf || null,
+        tipo, sala, data, horario_inicio: hi, horario_fim: hf || null,
         horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs
       }).eq('id', editandoId);
 
       if (error) { showToast('Erro ao salvar alterações.', 'error'); return; }
 
-      // Atualiza localmente
       const idx = reservations.findIndex(r => String(r.id) === String(editandoId));
       if (idx !== -1) {
         reservations[idx] = { ...reservations[idx], tipo, sala, data, horario_inicio: hi, horario_fim: hf || null, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
@@ -724,22 +789,10 @@
       const confirmar = document.getElementById('confirmar-senha').value;
       const erro      = document.getElementById('senha-erro');
       erro.classList.remove('show');
-
-      if (!nova || nova.length < 6) {
-        erro.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-        erro.classList.add('show'); return;
-      }
-      if (nova !== confirmar) {
-        erro.textContent = 'As senhas não coincidem.';
-        erro.classList.add('show'); return;
-      }
-
+      if (!nova || nova.length < 6) { erro.textContent = 'A senha deve ter pelo menos 6 caracteres.'; erro.classList.add('show'); return; }
+      if (nova !== confirmar) { erro.textContent = 'As senhas não coincidem.'; erro.classList.add('show'); return; }
       const { error } = await db.auth.updateUser({ password: nova });
-      if (error) {
-        erro.textContent = 'Erro ao alterar senha. Tente novamente.';
-        erro.classList.add('show'); return;
-      }
-
+      if (error) { erro.textContent = 'Erro ao alterar senha. Tente novamente.'; erro.classList.add('show'); return; }
       await registrarLog('ALTEROU SENHA', 'Usuário alterou a própria senha', 'auth');
       fecharModal('modal-senha');
       showToast('Senha alterada com sucesso!', 'success');
@@ -765,8 +818,8 @@
       );
       list.sort((a, b) => a.data.localeCompare(b.data) || a.horario_inicio.localeCompare(b.horario_inicio));
 
-      const container   = document.getElementById('reservations-list');
-      const isAdmin     = perfilAtual?.perfil === 'admin';
+      const container  = document.getElementById('reservations-list');
+      const isAdmin    = perfilAtual?.perfil === 'admin';
 
       document.getElementById('count-label').textContent =
         `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
