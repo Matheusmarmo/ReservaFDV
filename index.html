@@ -8,175 +8,140 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --navy: #0e1a38;
-      --navy2: #162040;
-      --navy3: #1e2d55;
-      --blue: #1a6fc4;
-      --sky: #4eaee8;
-      --sky-lt: #e8f4fc;
-      --white: #ffffff;
-      --off: #f4f6fa;
-      --border: #dce3ef;
-      --text: #1a2340;
-      --muted: #6b7a99;
+      --navy: #0e1a38; --navy2: #162040;
+      --blue: #1a6fc4; --sky: #4eaee8; --sky-lt: #e8f4fc;
+      --white: #ffffff; --off: #f4f6fa; --border: #dce3ef;
+      --text: #1a2340; --muted: #6b7a99;
       --danger: #d93a3a;
-      --success: #1a9e5c;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    html, body { height: 100%; }
     body {
       font-family: 'Open Sans', sans-serif;
-      background: var(--off);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background: var(--off); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
     }
 
-    .topbar { background: var(--navy); height: 7px; }
+    .topbar { background: var(--navy); height: 7px; flex-shrink: 0; }
 
     header {
-      background: var(--navy);
-      padding: 0 40px;
-      display: flex;
-      align-items: center;
-      height: 68px;
+      background: var(--navy); padding: 0 40px;
+      display: flex; align-items: center; height: 68px; flex-shrink: 0;
     }
-
     .header-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.9);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.9); letter-spacing: 0.04em; text-transform: uppercase;
     }
 
     .nav-strip {
-      background: var(--navy2);
-      border-bottom: 3px solid var(--blue);
-      height: 42px;
+      background: var(--navy2); border-bottom: 3px solid var(--blue);
+      height: 42px; flex-shrink: 0;
     }
 
     .login-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 16px;
+      flex: 1; display: flex; align-items: center;
+      justify-content: center; padding: 40px 16px;
     }
 
     .login-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 40px 36px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 24px rgba(14,26,56,0.08);
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 40px 36px;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 4px 32px rgba(14,26,56,0.10);
+    }
+
+    .login-logo {
+      text-align: center; margin-bottom: 28px;
+    }
+    .login-logo .logo-text {
+      font-family: 'Montserrat', sans-serif; font-size: 36px;
+      font-weight: 800; color: var(--navy); letter-spacing: 0.04em;
+      display: block;
+    }
+    .login-logo .logo-sub {
+      font-family: 'Montserrat', sans-serif; font-size: 11px;
+      font-weight: 600; color: var(--muted); letter-spacing: 0.1em;
+      text-transform: uppercase; display: block; margin-top: 4px;
+    }
+    .logo-divider {
+      width: 48px; height: 3px; background: var(--sky);
+      border-radius: 2px; margin: 10px auto 0;
     }
 
     .login-card h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--navy);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-family: 'Montserrat', sans-serif; font-size: 17px; font-weight: 800;
+      color: var(--navy); text-transform: uppercase; letter-spacing: 0.04em;
+      margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
     }
-
     .login-card h1::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 20px;
-      background: var(--sky);
-      border-radius: 2px;
+      content: ''; display: inline-block; width: 4px; height: 18px;
+      background: var(--sky); border-radius: 2px; flex-shrink: 0;
     }
-
     .login-subtitle {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 28px;
-      padding-left: 12px;
+      font-size: 12px; color: var(--muted); margin-bottom: 24px; padding-left: 12px;
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin-bottom: 16px;
-    }
-
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      font-family: 'Montserrat', sans-serif;
-      letter-spacing: 0.02em;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      font-family: 'Montserrat', sans-serif; letter-spacing: 0.02em;
     }
-
     input {
-      background: var(--off);
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: 'Open Sans', sans-serif;
-      font-size: 13px;
-      padding: 10px 12px;
-      width: 100%;
-      outline: none;
+      background: var(--off); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: 'Open Sans', sans-serif;
+      font-size: 14px; padding: 12px 14px; width: 100%; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
     }
-
     input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(26,111,196,0.12);
-      background: #fff;
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,111,196,0.12); background: #fff;
     }
-
     input.error {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(217,58,58,0.12);
+      border-color: var(--danger); box-shadow: 0 0 0 3px rgba(217,58,58,0.12);
     }
 
-    .btn-primary {
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 11px;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.2s;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-top: 8px;
+    .btn-login {
+      background: var(--blue); color: #fff; border: none; border-radius: 8px;
+      font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700;
+      padding: 13px; cursor: pointer; width: 100%; transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.04em; text-transform: uppercase; margin-top: 8px;
+      -webkit-appearance: none;
     }
-
-    .btn-primary:hover { background: #1560aa; }
-    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; }
+    .btn-login:hover { background: #1560aa; }
+    .btn-login:active { transform: scale(0.98); }
+    .btn-login:disabled { background: var(--muted); cursor: not-allowed; }
 
     .error-msg {
-      background: #fdf0f0;
-      border: 1px solid #f5c0c0;
-      border-radius: 6px;
-      color: var(--danger);
-      font-size: 12px;
-      padding: 10px 12px;
-      margin-top: 12px;
-      display: none;
+      background: #fdf0f0; border: 1px solid #f5c0c0; border-radius: 8px;
+      color: var(--danger); font-size: 12px; padding: 10px 14px; margin-top: 12px; display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .login-footer {
+      text-align: center; margin-top: 24px;
+      font-size: 11px; color: var(--muted);
     }
 
-    .error-msg.show { display: block; }
+    /* ══════════════════════════════════
+       RESPONSIVO — MOBILE
+    ══════════════════════════════════ */
+    @media (max-width: 480px) {
+      header { padding: 0 16px; height: 56px; }
+      .header-title { font-size: 12px; }
+
+      .login-wrap { padding: 24px 16px; align-items: flex-start; padding-top: 32px; }
+
+      .login-card {
+        padding: 28px 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(14,26,56,0.08);
+      }
+
+      .login-logo .logo-text { font-size: 30px; }
+      .login-card h1 { font-size: 15px; }
+      input { font-size: 16px; padding: 13px 14px; }
+      .btn-login { font-size: 15px; padding: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -188,29 +153,41 @@
 
   <div class="login-wrap">
     <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-text">FDV</span>
+        <span class="logo-sub">Sistema de Reservas</span>
+        <div class="logo-divider"></div>
+      </div>
+
       <h1>Acesso ao Sistema</h1>
       <p class="login-subtitle">Informe suas credenciais para continuar</p>
 
       <div class="form-group">
         <label for="email">E-mail</label>
-        <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+        <input type="email" id="email" placeholder="seu@email.com"
+          autocomplete="email" inputmode="email">
       </div>
 
       <div class="form-group">
         <label for="senha">Senha</label>
-        <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+        <input type="password" id="senha" placeholder="••••••••"
+          autocomplete="current-password">
       </div>
 
-      <div class="error-msg" id="error-msg">E-mail ou senha incorretos. Tente novamente.</div>
+      <div class="error-msg" id="error-msg"></div>
 
-      <button class="btn-primary" id="btn-login" onclick="fazerLogin()">Entrar</button>
+      <button class="btn-login" id="btn-login" onclick="fazerLogin()">Entrar</button>
+
+      <div class="login-footer">
+        Acesso restrito a usuários autorizados
+      </div>
     </div>
   </div>
 
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // Se já estiver logado, redireciona direto
+    // Redireciona se já estiver logado
     (async () => {
       const session = await getSession();
       if (session) {
@@ -233,8 +210,7 @@
 
       if (!email || !senha) {
         err.textContent = 'Preencha e-mail e senha.';
-        err.classList.add('show');
-        return;
+        err.classList.add('show'); return;
       }
 
       btn.disabled = true;
@@ -256,7 +232,6 @@
       window.location.href = perfil?.perfil === 'admin' ? 'admin.html' : 'reservas.html';
     }
 
-    // Login ao pressionar Enter
     document.addEventListener('keydown', e => {
       if (e.key === 'Enter') fazerLogin();
     });
