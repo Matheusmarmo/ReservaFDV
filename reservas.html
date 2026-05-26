@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --navy: #0e1a38; --navy2: #162040; --navy3: #1e2d55;
+      --navy: #0e1a38; --navy2: #162040;
       --blue: #1a6fc4; --sky: #4eaee8; --sky-lt: #e8f4fc;
       --white: #ffffff; --off: #f4f6fa; --border: #dce3ef;
       --text: #1a2340; --muted: #6b7a99;
@@ -18,34 +18,63 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Open Sans', sans-serif; background: var(--off); color: var(--text); min-height: 100vh; }
     .topbar { background: var(--navy); height: 7px; }
-    header { background: var(--navy); padding: 0 40px; display: flex; align-items: center; height: 68px; }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy); padding: 0 40px;
+      display: flex; align-items: center; height: 68px; gap: 12px;
+    }
     .header-title {
       font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
       color: rgba(255,255,255,0.9); letter-spacing: 0.04em; text-transform: uppercase;
+      flex: 1;
     }
-    .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .header-user { font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'Open Sans', sans-serif; }
     .btn-header {
       background: transparent; border: 1px solid rgba(255,255,255,0.25);
       color: rgba(255,255,255,0.7); border-radius: 5px; padding: 5px 12px;
       font-size: 11px; font-family: 'Montserrat', sans-serif; font-weight: 600;
       cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+      white-space: nowrap;
     }
     .btn-header:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+
+    /* ── Nav ── */
     .nav-strip {
       background: var(--navy2); border-bottom: 3px solid var(--blue);
       padding: 0 40px; display: flex; align-items: center; height: 42px; gap: 4px;
+      overflow-x: auto;
     }
     .nav-strip a {
       font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
       color: rgba(255,255,255,0.6); text-decoration: none; letter-spacing: 0.06em;
       text-transform: uppercase; padding: 0 14px; height: 100%;
       display: flex; align-items: center; border-bottom: 3px solid transparent;
-      margin-bottom: -3px; transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -3px; transition: color 0.2s, border-color 0.2s; white-space: nowrap;
     }
     .nav-strip a:hover { color: #fff; }
     .nav-strip a.active { color: #fff; border-bottom-color: var(--sky); }
-    .main-layout { display: grid; grid-template-columns: 360px 1fr; min-height: calc(100vh - 120px); }
+
+    /* ── Layout principal ── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      min-height: calc(100vh - 117px);
+    }
+
+    /* ── Botão mobile para abrir formulário ── */
+    .fab-nova-reserva {
+      display: none;
+      position: fixed; bottom: 24px; right: 24px; z-index: 500;
+      background: var(--blue); color: #fff; border: none; border-radius: 50px;
+      padding: 14px 20px; font-family: 'Montserrat', sans-serif; font-size: 13px;
+      font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(26,111,196,0.4);
+      letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
+    }
+    .fab-nova-reserva:hover { background: #1560aa; transform: scale(1.04); }
+
+    /* ── Sidebar ── */
     .sidebar {
       background: var(--white); border-right: 1px solid var(--border);
       padding: 28px 24px; display: flex; flex-direction: column; gap: 22px;
@@ -59,6 +88,10 @@
     .sidebar-heading::before {
       content: ''; display: inline-block; width: 4px; height: 18px;
       background: var(--sky); border-radius: 2px;
+    }
+    .sidebar-close {
+      display: none; margin-left: auto; background: none; border: none;
+      font-size: 20px; cursor: pointer; color: var(--muted); padding: 0 4px;
     }
     .section-label {
       font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
@@ -89,6 +122,8 @@
     }
     .btn-primary:hover { background: #1560aa; }
     .btn-primary:active { transform: scale(0.98); }
+
+    /* ── Content ── */
     .content-area { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
     .content-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
     .content-title {
@@ -109,10 +144,13 @@
       padding: 14px 18px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
     }
     .filters .form-group { flex: 1; min-width: 140px; }
+
+    /* ── Tabela ── */
     .reservations-wrap {
-      background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+      background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
     }
-    .res-table { width: 100%; border-collapse: collapse; }
+    .res-table { width: 100%; border-collapse: collapse; min-width: 600px; }
     .res-table th {
       font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
@@ -136,6 +174,7 @@
       display: inline-flex; align-items: center; gap: 4px;
       background: var(--sky-lt); color: var(--blue);
       border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600;
+      white-space: nowrap;
     }
     .btn-details {
       background: var(--sky-lt); border: 1px solid #b8d8f0; color: var(--blue);
@@ -158,24 +197,34 @@
       cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.2s;
     }
     .btn-del:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-    .card-actions { display: flex; gap: 6px; }
+    .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 13px; line-height: 1.6; }
+
+    /* ── Overlay mobile sidebar ── */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(14,26,56,0.5); z-index: 400;
+    }
+    .sidebar-overlay.open { display: block; }
+
+    /* ── Modais ── */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(14,26,56,0.5);
       display: none; align-items: center; justify-content: center; z-index: 1000;
+      padding: 16px;
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: var(--white); border-radius: 10px; padding: 32px;
+      background: var(--white); border-radius: 10px; padding: 28px;
       width: 100%; max-width: 500px; box-shadow: 0 8px 40px rgba(0,0,0,0.2);
       max-height: 90vh; overflow-y: auto;
     }
     .modal-title {
       font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800;
       color: var(--navy); text-transform: uppercase; letter-spacing: 0.04em;
-      margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
     }
     .modal-title::before {
       content: ''; display: inline-block; width: 4px; height: 18px;
@@ -183,12 +232,11 @@
     }
     .modal-section {
       font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue);
-      margin: 16px 0 10px;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); margin: 16px 0 10px;
     }
     .detail-row {
       display: flex; gap: 12px; padding: 10px 0;
-      border-bottom: 1px solid var(--border); align-items: baseline;
+      border-bottom: 1px solid var(--border); align-items: baseline; flex-wrap: wrap;
     }
     .detail-row:last-child { border-bottom: none; }
     .detail-key {
@@ -196,32 +244,36 @@
       letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); min-width: 110px;
     }
     .detail-val { font-size: 13px; color: var(--text); line-height: 1.5; }
-    .modal-footer { margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
     .btn-fechar {
       background: var(--off); color: var(--muted); border: 1px solid var(--border);
       font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700;
       letter-spacing: 0.04em; text-transform: uppercase; border-radius: 5px;
-      padding: 9px 20px; cursor: pointer; transition: background 0.2s;
+      padding: 9px 20px; cursor: pointer;
     }
     .btn-fechar:hover { background: var(--border); }
     .btn-save {
       background: var(--blue); color: #fff; border: none;
       font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700;
       letter-spacing: 0.04em; text-transform: uppercase; border-radius: 5px;
-      padding: 9px 20px; cursor: pointer; transition: background 0.2s;
+      padding: 9px 20px; cursor: pointer;
     }
     .btn-save:hover { background: #1560aa; }
+
+    /* ── Toast ── */
     .toast {
       position: fixed; bottom: 28px; right: 28px; background: var(--navy);
       color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px;
       display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none; max-width: 400px; z-index: 999;
+      pointer-events: none; max-width: calc(100vw - 32px); z-index: 999;
     }
     .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .toast.success .toast-icon { color: var(--success); }
     .toast.error   .toast-icon { color: var(--danger); }
-    .toast-icon { font-size: 16px; font-weight: 800; }
+    .toast-icon { font-size: 16px; font-weight: 800; flex-shrink: 0; }
+
+    /* ── Badges ── */
     .perfil-badge {
       font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
       padding: 3px 8px; border-radius: 20px; font-family: 'Montserrat', sans-serif;
@@ -238,6 +290,56 @@
       background: var(--sky-lt); border: 1px solid #b8d8f0; border-radius: 6px;
       color: var(--blue); font-size: 11px; padding: 8px 12px; margin-top: 4px;
     }
+
+    /* ══════════════════════════════════════════════
+       RESPONSIVO — MOBILE (≤ 768px)
+    ══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      header { padding: 0 16px; height: 60px; }
+      .header-title { font-size: 12px; }
+      .header-user { display: none; }
+      .btn-header { padding: 5px 8px; font-size: 10px; }
+
+      .nav-strip { padding: 0 16px; }
+
+      /* Layout vira coluna única */
+      .main-layout { grid-template-columns: 1fr; }
+
+      /* Sidebar vira drawer lateral */
+      .sidebar {
+        position: fixed; top: 0; left: 0; bottom: 0; width: 88vw; max-width: 360px;
+        z-index: 450; transform: translateX(-100%);
+        transition: transform 0.3s ease; overflow-y: auto;
+        border-right: 1px solid var(--border); box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-close { display: block; }
+
+      /* Botão flutuante de nova reserva */
+      .fab-nova-reserva { display: flex; align-items: center; gap: 8px; }
+
+      /* Content area menor padding */
+      .content-area { padding: 16px; gap: 14px; }
+      .content-title { font-size: 15px; }
+
+      /* Filtros em coluna */
+      .filters { padding: 12px; gap: 10px; }
+      .filters .form-group { min-width: 100%; flex: unset; }
+
+      /* Toast na parte inferior centrado */
+      .toast { bottom: 80px; right: 16px; left: 16px; max-width: unset; }
+
+      /* Modal ocupa mais espaço */
+      .modal { padding: 20px; }
+      .modal-footer { justify-content: stretch; }
+      .modal-footer .btn-fechar,
+      .modal-footer .btn-save { flex: 1; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .header-title { font-size: 11px; letter-spacing: 0.01em; }
+      .btn-header span { display: none; }
+    }
   </style>
 </head>
 
@@ -247,7 +349,7 @@
     <span class="header-title">FDV — Reservas de Espaços</span>
     <div class="header-right">
       <span class="header-user" id="header-user"></span>
-      <button class="btn-header" onclick="abrirAlterarSenha()">🔑 Alterar Senha</button>
+      <button class="btn-header" onclick="abrirAlterarSenha()">🔑 <span>Alterar Senha</span></button>
       <button class="btn-header" onclick="logout()">Sair</button>
     </div>
   </header>
@@ -256,9 +358,16 @@
     <a href="admin.html" id="nav-admin" style="display:none">Administração</a>
   </div>
 
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="fecharSidebar()"></div>
+
   <div class="main-layout">
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar-form">
-      <div class="sidebar-heading">Nova Reserva</div>
+      <div class="sidebar-heading">
+        Nova Reserva
+        <button class="sidebar-close" onclick="fecharSidebar()" title="Fechar">✕</button>
+      </div>
       <div>
         <div class="section-label">Espaço</div>
         <div class="form-group">
@@ -287,7 +396,7 @@
           </div>
         </div>
         <div class="info-note" id="multi-day-note" style="display:none">
-          📅 Será criada uma reserva para cada dia do período selecionado.
+          📅 Será criada uma reserva para cada dia do período.
         </div>
         <div class="time-grid">
           <div class="form-group">
@@ -322,6 +431,7 @@
       <button class="btn-primary" onclick="addReservation()">Confirmar Reserva</button>
     </aside>
 
+    <!-- Sidebar visualizador -->
     <aside class="sidebar" id="sidebar-viewer" style="display:none">
       <div class="sidebar-heading">Consulta</div>
       <p style="font-size:13px; color:var(--muted); line-height:1.6;">
@@ -340,7 +450,6 @@
       <div class="filters">
         <div class="form-group">
           <label>Filtrar por Data</label>
-          <!-- Mudança 1: autocomplete="off" nos filtros -->
           <input type="date" id="filter-date" autocomplete="off" oninput="renderList()">
         </div>
         <div class="form-group">
@@ -365,6 +474,11 @@
     </main>
   </div>
 
+  <!-- Botão flutuante mobile -->
+  <button class="fab-nova-reserva" id="fab-btn" onclick="abrirSidebar()">
+    ＋ Nova Reserva
+  </button>
+
   <!-- Modal Detalhes -->
   <div class="modal-overlay" id="modal-detalhes">
     <div class="modal">
@@ -376,7 +490,7 @@
     </div>
   </div>
 
-  <!-- Modal Editar Reserva -->
+  <!-- Modal Editar -->
   <div class="modal-overlay" id="modal-editar">
     <div class="modal">
       <div class="modal-title">Editar Reserva</div>
@@ -410,29 +524,29 @@
       </div>
       <div class="modal-section">Informações</div>
       <div class="form-group">
-        <label>Responsável / Solicitante</label>
-        <input type="text" id="e-favorecido" placeholder="Nome do responsável" autocomplete="off">
+        <label>Responsável</label>
+        <input type="text" id="e-favorecido" autocomplete="off">
       </div>
       <div class="form-group">
         <label>Curso / Evento</label>
-        <input type="text" id="e-evento" placeholder="Nome do evento ou curso" autocomplete="off">
+        <input type="text" id="e-evento" autocomplete="off">
       </div>
       <div class="form-group">
         <label>Motivo</label>
-        <input type="text" id="e-motivo" placeholder="Motivo de uso" autocomplete="off">
+        <input type="text" id="e-motivo" autocomplete="off">
       </div>
       <div class="form-group">
         <label>Observações</label>
-        <textarea id="e-observacoes" placeholder="Informações adicionais..." autocomplete="off"></textarea>
+        <textarea id="e-observacoes" autocomplete="off"></textarea>
       </div>
       <div class="modal-footer">
         <button class="btn-fechar" onclick="fecharModal('modal-editar')">Cancelar</button>
-        <button class="btn-save" onclick="salvarEdicao()">Salvar Alterações</button>
+        <button class="btn-save" onclick="salvarEdicao()">Salvar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Alterar Senha -->
+  <!-- Modal Senha -->
   <div class="modal-overlay" id="modal-senha">
     <div class="modal">
       <div class="modal-title">Alterar Senha</div>
@@ -478,15 +592,14 @@
 
       if (perfilAtual.perfil === 'visualizador') {
         document.getElementById('sidebar-form').style.display = 'none';
-        document.getElementById('sidebar-viewer').style.display = 'flex';
+        document.getElementById('sidebar-viewer').style.display = 'none';
+        document.getElementById('fab-btn').style.display = 'none';
       }
 
       document.getElementById('data').value = new Date().toISOString().split('T')[0];
 
-      // Mostra aviso de múltiplos dias quando data_fim é preenchida
       document.getElementById('data_fim').addEventListener('change', function() {
-        const note = document.getElementById('multi-day-note');
-        note.style.display = this.value ? 'block' : 'none';
+        document.getElementById('multi-day-note').style.display = this.value ? 'block' : 'none';
       });
 
       await loadLocais();
@@ -496,6 +609,18 @@
         o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
       });
     });
+
+    // ── Sidebar mobile ───────────────────────────────────────
+    function abrirSidebar() {
+      document.getElementById('sidebar-form').classList.add('open');
+      document.getElementById('sidebar-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function fecharSidebar() {
+      document.getElementById('sidebar-form').classList.remove('open');
+      document.getElementById('sidebar-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
 
     // ── Log ─────────────────────────────────────────────────
     async function registrarLog(acao, detalhe, tabela = 'reservas') {
@@ -536,8 +661,8 @@
     }
 
     function updateEditRoomOptions() {
-      const tipo = document.getElementById('e-tipo').value;
-      const sel  = document.getElementById('e-sala');
+      const tipo  = document.getElementById('e-tipo').value;
+      const sel   = document.getElementById('e-sala');
       const atual = sel.value;
       sel.innerHTML = (locaisMap[tipo] || []).map(s => `<option value="${s}">${s}</option>`).join('');
       if (atual) sel.value = atual;
@@ -567,7 +692,6 @@
       if (error) throw error;
     }
 
-    // ── Gera lista de datas entre duas datas ─────────────────
     function gerarDatas(dataInicio, dataFim) {
       const datas = [];
       const atual = new Date(dataInicio + 'T12:00:00');
@@ -605,32 +729,24 @@
       const mot        = document.getElementById('motivo').value.trim();
       const obs        = document.getElementById('observacoes').value.trim();
 
-      // Validações
       if (!dataInicio) { setFieldError('data', true); showToast('Selecione a data de início.', 'error'); return; }
       if (!hi) { setFieldError('horario_inicio', true); showToast('Informe o horário de início.', 'error'); return; }
       if (!ev && !fav) {
         setFieldError('favorecido', true); setFieldError('evento', true);
         showToast('Informe o responsável ou o evento.', 'error'); return;
       }
-
-      // Mudança 3: Valida se horário fim não é anterior ao início
       if (hf && hf <= hi) {
         setFieldError('horario_fim', true);
-        showToast('O horário de fim não pode ser igual ou anterior ao horário de início.', 'error', 5000);
-        return;
+        showToast('O horário de fim não pode ser igual ou anterior ao início.', 'error', 5000); return;
       }
-
-      // Valida data fim não anterior à data início
       if (dataFim && dataFim < dataInicio) {
         setFieldError('data_fim', true);
-        showToast('A data final não pode ser anterior à data de início.', 'error');
-        return;
+        showToast('A data final não pode ser anterior à data de início.', 'error'); return;
       }
 
       const horario = hf ? `${hi} até ${hf}` : hi;
       const datas   = gerarDatas(dataInicio, dataFim);
 
-      // Verifica conflitos em todos os dias
       for (const data of datas) {
         const conflict = reservations.find(r => {
           if (r.sala !== sala || r.data !== data) return false;
@@ -641,12 +757,11 @@
         if (conflict) {
           setFieldError('horario_inicio', true); setFieldError('sala', true);
           const d = new Date(data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
-          showToast(`Conflito em ${d}! "${conflict.sala}" já reservada às ${conflict.horario_inicio} para "${conflict.evento || conflict.favorecido}".`, 'error', 6000);
+          showToast(`Conflito em ${d}! "${conflict.sala}" já reservada às ${conflict.horario_inicio}.`, 'error', 6000);
           return;
         }
       }
 
-      // Salva uma reserva para cada dia
       let salvas = 0;
       for (const data of datas) {
         try {
@@ -659,11 +774,7 @@
       }
 
       renderList();
-
-      const msg = datas.length > 1
-        ? `${salvas} reservas criadas (${datas.length} dias)!`
-        : 'Reserva adicionada com sucesso!';
-      showToast(msg, 'success');
+      showToast(datas.length > 1 ? `${salvas} reservas criadas (${datas.length} dias)!` : 'Reserva adicionada com sucesso!', 'success');
       await registrarLog('CRIOU RESERVA', `${sala} de ${dataInicio}${dataFim && dataFim !== dataInicio ? ' até ' + dataFim : ''} às ${horario} — ${ev || fav}`);
 
       ['evento','favorecido','motivo','observacoes'].forEach(id => document.getElementById(id).value = '');
@@ -672,24 +783,23 @@
       document.getElementById('data_fim').value       = '';
       document.getElementById('multi-day-note').style.display = 'none';
       clearFieldErrors();
+      fecharSidebar();
     }
 
     async function deleteReservation(id) {
-      if (perfilAtual?.perfil === 'visualizador') return;
       if (!confirm('Tem certeza que deseja remover esta reserva?')) return;
       const r = reservations.find(r => String(r.id) === String(id));
       try {
         await deleteFromSupabase(id);
         reservations = reservations.filter(r => String(r.id) !== String(id));
         renderList();
-        if (r) await registrarLog('REMOVEU RESERVA', `${r.sala} em ${r.data} às ${r.horario} — ${r.evento || r.favorecido}`);
-        showToast('Reserva removida com sucesso.', 'success');
+        if (r) await registrarLog('REMOVEU RESERVA', `${r.sala} em ${r.data} — ${r.evento || r.favorecido}`);
+        showToast('Reserva removida.', 'success');
       } catch (err) {
         showToast('Erro ao remover reserva.', 'error');
       }
     }
 
-    // ── Editar ───────────────────────────────────────────────
     function abrirEditar(id) {
       const r = reservations.find(r => String(r.id) === String(id));
       if (!r) return;
@@ -721,15 +831,9 @@
       if (!data) { showToast('Selecione uma data.', 'error'); return; }
       if (!hi)   { showToast('Informe o horário de início.', 'error'); return; }
       if (!ev && !fav) { showToast('Informe o responsável ou o evento.', 'error'); return; }
-
-      // Mudança 3 também na edição
-      if (hf && hf <= hi) {
-        showToast('O horário de fim não pode ser igual ou anterior ao horário de início.', 'error', 5000);
-        return;
-      }
+      if (hf && hf <= hi) { showToast('O horário de fim não pode ser igual ou anterior ao início.', 'error', 5000); return; }
 
       const horario = hf ? `${hi} até ${hf}` : hi;
-
       const { error } = await db.from(TABELA).update({
         tipo, sala, data, horario_inicio: hi, horario_fim: hf || null,
         horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs
@@ -738,9 +842,7 @@
       if (error) { showToast('Erro ao salvar alterações.', 'error'); return; }
 
       const idx = reservations.findIndex(r => String(r.id) === String(editandoId));
-      if (idx !== -1) {
-        reservations[idx] = { ...reservations[idx], tipo, sala, data, horario_inicio: hi, horario_fim: hf || null, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
-      }
+      if (idx !== -1) reservations[idx] = { ...reservations[idx], tipo, sala, data, horario_inicio: hi, horario_fim: hf || null, horario, favorecido: fav, evento: ev, motivo: mot, observacoes: obs };
 
       renderList();
       await registrarLog('EDITOU RESERVA', `${sala} em ${data} às ${horario} — ${ev || fav}`);
@@ -748,15 +850,13 @@
       showToast('Reserva atualizada com sucesso!', 'success');
     }
 
-    // ── Detalhes ─────────────────────────────────────────────
     function abrirDetalhes(id) {
       const r = reservations.find(r => String(r.id) === String(id));
       if (!r) return;
       const [ano, mes, dia] = r.data.split('-');
-      const dataFmt = `${dia}/${mes}/${ano}`;
-      const tipos   = { sala: 'Sala de Aula', auditorio: 'Auditório', lab: 'Laboratório' };
-      const campos  = [
-        { label: 'Data',         val: dataFmt },
+      const tipos = { sala: 'Sala de Aula', auditorio: 'Auditório', lab: 'Laboratório' };
+      const campos = [
+        { label: 'Data',         val: `${dia}/${mes}/${ano}` },
         { label: 'Horário',      val: r.horario },
         { label: 'Espaço',       val: r.sala },
         { label: 'Tipo',         val: tipos[r.tipo] || r.tipo },
@@ -767,16 +867,10 @@
       ].filter(Boolean);
 
       document.getElementById('modal-detalhes-body').innerHTML =
-        campos.map(c => `
-          <div class="detail-row">
-            <span class="detail-key">${c.label}</span>
-            <span class="detail-val">${c.val}</span>
-          </div>`).join('');
-
+        campos.map(c => `<div class="detail-row"><span class="detail-key">${c.label}</span><span class="detail-val">${c.val}</span></div>`).join('');
       document.getElementById('modal-detalhes').classList.add('open');
     }
 
-    // ── Alterar Senha ────────────────────────────────────────
     function abrirAlterarSenha() {
       document.getElementById('nova-senha').value      = '';
       document.getElementById('confirmar-senha').value = '';
@@ -792,16 +886,13 @@
       if (!nova || nova.length < 6) { erro.textContent = 'A senha deve ter pelo menos 6 caracteres.'; erro.classList.add('show'); return; }
       if (nova !== confirmar) { erro.textContent = 'As senhas não coincidem.'; erro.classList.add('show'); return; }
       const { error } = await db.auth.updateUser({ password: nova });
-      if (error) { erro.textContent = 'Erro ao alterar senha. Tente novamente.'; erro.classList.add('show'); return; }
+      if (error) { erro.textContent = 'Erro ao alterar senha.'; erro.classList.add('show'); return; }
       await registrarLog('ALTEROU SENHA', 'Usuário alterou a própria senha', 'auth');
       fecharModal('modal-senha');
       showToast('Senha alterada com sucesso!', 'success');
     }
 
-    // ── Utilitários ──────────────────────────────────────────
-    function fecharModal(id) {
-      document.getElementById(id).classList.remove('open');
-    }
+    function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 
     function renderList() {
       const fDate = document.getElementById('filter-date').value;
@@ -818,8 +909,8 @@
       );
       list.sort((a, b) => a.data.localeCompare(b.data) || a.horario_inicio.localeCompare(b.horario_inicio));
 
-      const container  = document.getElementById('reservations-list');
-      const isAdmin    = perfilAtual?.perfil === 'admin';
+      const container = document.getElementById('reservations-list');
+      const isAdmin   = perfilAtual?.perfil === 'admin';
 
       document.getElementById('count-label').textContent =
         `${reservations.length} reserva${reservations.length !== 1 ? 's' : ''}`;
@@ -841,10 +932,9 @@
             <tbody>
               ${list.map(r => {
                 const [ano, mes, dia] = r.data.split('-');
-                const dataFmt = `${dia}/${mes}/${ano}`;
                 const typeLbl = r.tipo === 'sala' ? 'Sala' : r.tipo === 'auditorio' ? 'Auditório' : 'Lab';
                 return `<tr>
-                  <td style="white-space:nowrap;font-weight:600">${dataFmt}</td>
+                  <td style="white-space:nowrap;font-weight:600">${dia}/${mes}/${ano}</td>
                   <td><span class="time-badge">⏱ ${r.horario}</span></td>
                   <td style="font-weight:600">${r.sala}</td>
                   <td><span class="type-badge type-${r.tipo}">${typeLbl}</span></td>
@@ -853,7 +943,7 @@
                   <td><div class="card-actions">
                     <button class="btn-details" onclick="abrirDetalhes(${r.id})">Detalhes</button>
                     ${isAdmin ? `<button class="btn-edit" onclick="abrirEditar(${r.id})">Editar</button>` : ''}
-                    ${isAdmin ? `<button class="btn-del"  onclick="deleteReservation(${r.id})">Remover</button>` : ''}
+                    ${isAdmin ? `<button class="btn-del" onclick="deleteReservation(${r.id})">Remover</button>` : ''}
                   </div></td>
                 </tr>`;
               }).join('')}
